@@ -22,7 +22,7 @@ const (
 	IMDNACSignAddress              = 0x3e5184
 )
 
-var base uintptr
+var nacInitAddr, nacKeyEstablishmentAddr, nacSignAddr unsafe.Pointer
 
 func Load() error {
 	handle := C.dlopen(C.CString(IMDPath), C.RTLD_LAZY)
@@ -33,7 +33,10 @@ func Load() error {
 	if ref == nil {
 		return fmt.Errorf("failed to find %s at %x: %v", IMDReferenceSymbol, IMDReferenceAddress, C.GoString(C.dlerror()))
 	}
-	base = uintptr(ref) - IMDReferenceAddress
+	base := unsafe.Add(unsafe.Pointer(ref), -IMDReferenceAddress)
+	nacInitAddr = unsafe.Add(base, IMDNACInitAddress)
+	nacKeyEstablishmentAddr = unsafe.Add(base, IMDNACKeyEstablishmentAdddress)
+	nacSignAddr = unsafe.Add(base, IMDNACSignAddress)
 	return nil
 }
 
@@ -47,7 +50,7 @@ func MeowMemory() func() {
 }
 
 func SanityCheck() error {
-	resp := int(C.nacInitProxy(unsafe.Pointer(base+IMDNACInitAddress), nil, C.int(0), nil, nil, nil))
+	resp := int(C.nacInitProxy(nacInitAddr, nil, C.int(0), nil, nil, nil))
 	if resp != -44023 {
 		return fmt.Errorf("NACInit sanity check had unexpected response %d", resp)
 	}
@@ -58,7 +61,7 @@ func Init(cert []byte) (validationCtx unsafe.Pointer, request []byte, err error)
 	var outputBytesLen C.int
 	var outputBytesPtr unsafe.Pointer
 	resp := int(C.nacInitProxy(
-		unsafe.Pointer(base+IMDNACInitAddress),
+		nacInitAddr,
 		unsafe.Pointer(&cert[0]),
 		C.int(len(cert)),
 		&validationCtx,
@@ -75,7 +78,7 @@ func Init(cert []byte) (validationCtx unsafe.Pointer, request []byte, err error)
 
 func KeyEstablishment(validationCtx unsafe.Pointer, response []byte) (err error) {
 	resp := int(C.nacKeyEstablishmentProxy(
-		unsafe.Pointer(base+IMDNACKeyEstablishmentAdddress),
+		nacKeyEstablishmentAddr,
 		validationCtx,
 		unsafe.Pointer(&response[0]),
 		C.int(len(response)),
@@ -91,7 +94,7 @@ func Sign(validationCtx unsafe.Pointer) (validationData []byte, err error) {
 	var outputBytesPtr unsafe.Pointer
 	var outputBytesLen C.int
 	resp := int(C.nacSignProxy(
-		unsafe.Pointer(base+IMDNACSignAddress),
+		nacSignAddr,
 		validationCtx,
 		nil,
 		C.int(0),
