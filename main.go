@@ -6,37 +6,70 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/beeper/nacserv-native/nac"
+	"github.com/beeper/nacserv-native/requests"
+	"github.com/beeper/nacserv-native/versions"
 )
 
 func main() {
-	_ = json.NewEncoder(os.Stderr).Encode(&versions)
+	_ = json.NewEncoder(os.Stderr).Encode(&versions.Current)
 
-	defer meowMemory()()
-	err := nacSanityCheck()
+	err := initSanityCheck()
 	if err != nil {
 		panic(err)
 	}
+	err = initFetchCert(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	validationData, err := generateValidationData()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(base64.StdEncoding.EncodeToString(validationData))
+}
+
+var globalCert []byte
+
+func initFetchCert(ctx context.Context) error {
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	var err error
+	globalCert, err = requests.FetchCert(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to fetch cert: %w", err)
+	}
+	return nil
+}
+
+func initSanityCheck() error {
+	defer nac.MeowMemory()()
+	return nac.SanityCheck()
+}
+
+func generateValidationData() ([]byte, error) {
+	defer nac.MeowMemory()()
 
 	ctx := context.Background()
-	cert, err := fetchCert(ctx)
+	validationCtx, request, err := nac.Init(globalCert)
 	if err != nil {
-		panic(fmt.Errorf("failed to fetch cert: %w", err))
+		return nil, err
 	}
-	validationCtx, request, err := nacInit(cert)
+	sessionInfo, err := requests.InitializeValidation(ctx, request)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to initialize validation: %w", err)
 	}
-	sessionInfo, err := fetchInitializeValidation(ctx, request)
+	err = nac.KeyEstablishment(validationCtx, sessionInfo)
 	if err != nil {
-		panic(fmt.Errorf("failed to initialize validation: %w", err))
+		return nil, err
 	}
-	err = nacKeyEstablishment(validationCtx, sessionInfo)
+	validationData, err := nac.Sign(validationCtx)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	validationData, err := nacSign(validationCtx)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(base64.StdEncoding.EncodeToString(validationData))
+	return validationData, nil
 }

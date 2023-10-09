@@ -1,4 +1,4 @@
-package main
+package requests
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"net/http"
 
 	"howett.net/plist"
+
+	"github.com/beeper/nacserv-native/versions"
 )
 
 var client = &http.Client{}
@@ -37,7 +39,7 @@ func makeRequest(ctx context.Context, url string, body, output any) error {
 	if err != nil {
 		return fmt.Errorf("failed to prepare request: %w", err)
 	}
-	req.Header.Set("User-Agent", versions.UserAgent())
+	req.Header.Set("User-Agent", versions.Current.UserAgent())
 	if bodyReader != nil {
 		req.Header.Set("Content-Type", "application/x-apple-plist")
 	}
@@ -59,7 +61,7 @@ func makeRequest(ctx context.Context, url string, body, output any) error {
 	return nil
 }
 
-func fetchCert(ctx context.Context) ([]byte, error) {
+func FetchCert(ctx context.Context) ([]byte, error) {
 	var parsedResp CertResponse
 	err := makeRequest(ctx, validationCertURL, nil, &parsedResp)
 	return parsedResp.Cert, err
@@ -73,7 +75,7 @@ type RespInitializeValidation struct {
 	SessionInfo []byte `plist:"session-info"`
 }
 
-func fetchInitializeValidation(ctx context.Context, request []byte) ([]byte, error) {
+func InitializeValidation(ctx context.Context, request []byte) ([]byte, error) {
 	var parsedResp RespInitializeValidation
 	err := makeRequest(ctx, initializeValidationURL, &ReqInitializeValidation{request}, &parsedResp)
 	return parsedResp.SessionInfo, err

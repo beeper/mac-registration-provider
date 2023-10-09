@@ -1,4 +1,4 @@
-package main
+package nac
 
 // TODO Should this use -fobjc-arc to enable automatic reference counting?
 
@@ -13,7 +13,7 @@ import (
 	"unsafe"
 )
 
-func meowMemory() func() {
+func MeowMemory() func() {
 	runtime.LockOSThread()
 	pool := C.meowMakePool()
 	return func() {
@@ -22,7 +22,7 @@ func meowMemory() func() {
 	}
 }
 
-func nacSanityCheck() error {
+func SanityCheck() error {
 	resp := int(C.NACInit(nil, C.int(0), nil, nil, nil))
 	if resp != -44023 {
 		return fmt.Errorf("NACInit sanity check had unexpected response %d", resp)
@@ -30,7 +30,7 @@ func nacSanityCheck() error {
 	return nil
 }
 
-func nacInit(cert []byte) (validationCtx unsafe.Pointer, request []byte, err error) {
+func Init(cert []byte) (validationCtx unsafe.Pointer, request []byte, err error) {
 	var outputBytesLen C.int
 	var outputBytesPtr unsafe.Pointer
 	resp := int(C.NACInit(
@@ -48,7 +48,7 @@ func nacInit(cert []byte) (validationCtx unsafe.Pointer, request []byte, err err
 	return
 }
 
-func nacKeyEstablishment(validationCtx unsafe.Pointer, response []byte) (err error) {
+func KeyEstablishment(validationCtx unsafe.Pointer, response []byte) (err error) {
 	resp := int(C.NACKeyEstablishment(
 		validationCtx,
 		unsafe.Pointer(&response[0]),
@@ -61,7 +61,7 @@ func nacKeyEstablishment(validationCtx unsafe.Pointer, response []byte) (err err
 	return
 }
 
-func nacSign(validationCtx unsafe.Pointer) (validationData []byte, err error) {
+func Sign(validationCtx unsafe.Pointer) (validationData []byte, err error) {
 	var outputBytesPtr unsafe.Pointer
 	var outputBytesLen C.int
 	resp := int(C.NACSign(

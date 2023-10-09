@@ -1,4 +1,4 @@
-package main
+package versions
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ func (v *Versions) UserAgent() string {
 	return fmt.Sprintf("[%s,%s,%s,%s]", v.SoftwareName, v.SoftwareVersion, v.SoftwareBuildID, v.HardwareVersion)
 }
 
-func getVersions() Versions {
+func Get() Versions {
 	// Alternative methods:
 	// Hardware version: `system_profiler SPHardwareDataType | awk '/Model Identifier/ { print $3 }'`
 	// Software version: `sw_vers -productVersion`
@@ -43,4 +43,4 @@ func getVersions() Versions {
 	}
 }
 
-var versions = getVersions()
+var Current = Get()
