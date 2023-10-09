@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/beeper/nacserv-native/nac"
@@ -21,8 +23,12 @@ type ReqSubmitValidationData struct {
 	DeviceInfo     versions.Versions `json:"device_info"`
 }
 
+const Version = "0.1.0"
+
 var submitURL = flag.String("url", "", "URL to submit validation data to")
+var submitToken = flag.String("token", "", "Token to include when submitting validation data")
 var submitInterval = flag.Duration("interval", 5*time.Minute, "Interval at which to submit new validation data to the server")
+var submitUserAgent = fmt.Sprintf("nacserv-native/%s go/%s macOS/%s", Version, strings.TrimPrefix(runtime.Version(), "go"), versions.Current.SoftwareVersion)
 
 func main() {
 	flag.Parse()
@@ -68,6 +74,10 @@ func submitValidationData(ctx context.Context, data []byte) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, *submitURL, &buf)
 	if err != nil {
 		return fmt.Errorf("failed to prepare request: %w", err)
+	}
+	req.Header.Set("User-Agent", submitUserAgent)
+	if len(*submitToken) > 0 {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *submitToken))
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
