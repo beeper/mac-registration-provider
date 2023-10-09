@@ -1,17 +1,41 @@
 package nac
 
-// TODO Should this use -fobjc-arc to enable automatic reference counting?
+// TODO Should this use -fobjc-arc to enable automatic reference counting instead of NSAutoreleasePool?
 
 //#cgo CFLAGS: -x objective-c -Wno-deprecated-declarations -Wno-incompatible-pointer-types
 //#cgo LDFLAGS: -framework Foundation -framework IOKit
 //#include "nac.h"
-//#include "meowMemory.h"
+//#include <dlfcn.h>
 import "C"
 import (
 	"fmt"
 	"runtime"
 	"unsafe"
 )
+
+const (
+	IMDPath                        = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
+	IMDReferenceSymbol             = "IDSProtoKeyTransparencyTrustedServiceReadFrom"
+	IMDReferenceAddress            = 0xb524c
+	IMDNACInitAddress              = 0x41d714
+	IMDNACKeyEstablishmentAdddress = 0x40af78
+	IMDNACSignAddress              = 0x3e5184
+)
+
+var base uintptr
+
+func Load() error {
+	handle := C.dlopen(C.CString(IMDPath), C.RTLD_LAZY)
+	if handle == nil {
+		return fmt.Errorf("failed to load %s: %v", IMDPath, C.GoString(C.dlerror()))
+	}
+	ref := C.dlsym(handle, C.CString(IMDReferenceSymbol))
+	if ref == nil {
+		return fmt.Errorf("failed to find %s at %x: %v", IMDReferenceSymbol, IMDReferenceAddress, C.GoString(C.dlerror()))
+	}
+	base = uintptr(ref) - IMDReferenceAddress
+	return nil
+}
 
 func MeowMemory() func() {
 	runtime.LockOSThread()
@@ -23,7 +47,7 @@ func MeowMemory() func() {
 }
 
 func SanityCheck() error {
-	resp := int(C.NACInit(nil, C.int(0), nil, nil, nil))
+	resp := int(C.nacInitProxy(unsafe.Pointer(base+IMDNACInitAddress), nil, C.int(0), nil, nil, nil))
 	if resp != -44023 {
 		return fmt.Errorf("NACInit sanity check had unexpected response %d", resp)
 	}
@@ -33,7 +57,8 @@ func SanityCheck() error {
 func Init(cert []byte) (validationCtx unsafe.Pointer, request []byte, err error) {
 	var outputBytesLen C.int
 	var outputBytesPtr unsafe.Pointer
-	resp := int(C.NACInit(
+	resp := int(C.nacInitProxy(
+		unsafe.Pointer(base+IMDNACInitAddress),
 		unsafe.Pointer(&cert[0]),
 		C.int(len(cert)),
 		&validationCtx,
@@ -49,7 +74,8 @@ func Init(cert []byte) (validationCtx unsafe.Pointer, request []byte, err error)
 }
 
 func KeyEstablishment(validationCtx unsafe.Pointer, response []byte) (err error) {
-	resp := int(C.NACKeyEstablishment(
+	resp := int(C.nacKeyEstablishmentProxy(
+		unsafe.Pointer(base+IMDNACKeyEstablishmentAdddress),
 		validationCtx,
 		unsafe.Pointer(&response[0]),
 		C.int(len(response)),
@@ -64,7 +90,8 @@ func KeyEstablishment(validationCtx unsafe.Pointer, response []byte) (err error)
 func Sign(validationCtx unsafe.Pointer) (validationData []byte, err error) {
 	var outputBytesPtr unsafe.Pointer
 	var outputBytesLen C.int
-	resp := int(C.NACSign(
+	resp := int(C.nacSignProxy(
+		unsafe.Pointer(base+IMDNACSignAddress),
 		validationCtx,
 		nil,
 		C.int(0),

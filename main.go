@@ -50,8 +50,13 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
+	log.Println("Loading identityservicesd")
+	err := nac.Load()
+	if err != nil {
+		panic(err)
+	}
 	log.Println("Running sanity check...")
-	err := initSanityCheck()
+	err = initSanityCheck()
 	if err != nil {
 		panic(err)
 	}
