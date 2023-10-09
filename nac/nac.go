@@ -41,7 +41,7 @@ func Load() error {
 		return err
 	}
 	offs, ok := offsets[hash]
-	if !ok {
+	if !ok || offs.ReferenceSymbol == "" {
 		return fmt.Errorf("no offsets for %x", hash[:])
 	}
 
