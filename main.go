@@ -36,6 +36,10 @@ var once = flag.Bool("once", false, "Generate a single validation data, print it
 func main() {
 	flag.Parse()
 	if !*once {
+		if len(*submitURL) == 0 {
+			flag.Usage()
+			return
+		}
 		parsedURL, err := url.Parse(*submitURL)
 		if err != nil {
 			panic(fmt.Errorf("failed to parse input URL: %w", err))
