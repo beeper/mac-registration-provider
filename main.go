@@ -22,7 +22,7 @@ type ReqSubmitValidationData struct {
 }
 
 var submitURL = flag.String("url", "", "URL to submit validation data to")
-var submitInterval = flag.Duration("duration", 5*time.Minute, "Interval at which to submit new validation data to the server")
+var submitInterval = flag.Duration("interval", 5*time.Minute, "Interval at which to submit new validation data to the server")
 
 func main() {
 	flag.Parse()
