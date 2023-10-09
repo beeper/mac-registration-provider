@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/beeper/nacserv-native/nac"
@@ -21,15 +21,12 @@ type ReqSubmitValidationData struct {
 	DeviceInfo     versions.Versions `json:"device_info"`
 }
 
-const submitInterval = 5 * time.Minute
+var submitURL = flag.String("url", "", "URL to submit validation data to")
+var submitInterval = flag.Duration("duration", 5*time.Minute, "Interval at which to submit new validation data to the server")
 
 func main() {
-	if len(os.Args) < 2 {
-		_, _ = fmt.Fprintln(os.Stderr, "Usage: nacserv-native <url>")
-		os.Exit(2)
-	}
-	submitURL := os.Args[len(os.Args)-1]
-	parsedURL, err := url.Parse(submitURL)
+	flag.Parse()
+	parsedURL, err := url.Parse(*submitURL)
 	if err != nil {
 		panic(fmt.Errorf("failed to parse input URL: %w", err))
 	} else if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
@@ -50,16 +47,16 @@ func main() {
 		log.Println("Generating validation data...")
 		if validationData, err := generateValidationData(context.Background()); err != nil {
 			log.Printf("Failed to generate validation data: %v", err)
-		} else if err = submitValidationData(context.Background(), submitURL, validationData); err != nil {
+		} else if err = submitValidationData(context.Background(), validationData); err != nil {
 			log.Printf("Failed to submit validation data: %v", err)
 		} else {
 			log.Println("Successfully generated and submitted validation data")
 		}
-		time.Sleep(submitInterval)
+		time.Sleep(*submitInterval)
 	}
 }
 
-func submitValidationData(ctx context.Context, submitURL string, data []byte) error {
+func submitValidationData(ctx context.Context, data []byte) error {
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
@@ -68,7 +65,7 @@ func submitValidationData(ctx context.Context, submitURL string, data []byte) er
 	if err != nil {
 		return fmt.Errorf("failed to encode request payload: %w", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, submitURL, &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, *submitURL, &buf)
 	if err != nil {
 		return fmt.Errorf("failed to prepare request: %w", err)
 	}
