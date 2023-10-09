@@ -8,35 +8,55 @@ package nac
 //#include <dlfcn.h>
 import "C"
 import (
+	"crypto/sha256"
 	"fmt"
+	"io"
+	"os"
 	"runtime"
 	"unsafe"
 )
 
 const (
-	IMDPath                        = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
-	IMDReferenceSymbol             = "IDSProtoKeyTransparencyTrustedServiceReadFrom"
-	IMDReferenceAddress            = 0xb524c
-	IMDNACInitAddress              = 0x41d714
-	IMDNACKeyEstablishmentAdddress = 0x40af78
-	IMDNACSignAddress              = 0x3e5184
+	IMDPath = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
 )
 
 var nacInitAddr, nacKeyEstablishmentAddr, nacSignAddr unsafe.Pointer
 
+func sha256sum(path string) (hash [32]byte, err error) {
+	hasher := sha256.New()
+	var file *os.File
+	if file, err = os.Open(path); err != nil {
+		err = fmt.Errorf("failed to open %q: %w", path, err)
+	} else if _, err = io.Copy(hasher, file); err != nil {
+		err = fmt.Errorf("failed to hash %q: %w", path, err)
+	} else {
+		hash = *(*[32]byte)(hasher.Sum(nil))
+	}
+	return
+}
+
 func Load() error {
+	hash, err := sha256sum(IMDPath)
+	if err != nil {
+		return err
+	}
+	offs, ok := offsets[hash]
+	if !ok {
+		return fmt.Errorf("no offsets for %x", hash[:])
+	}
+
 	handle := C.dlopen(C.CString(IMDPath), C.RTLD_LAZY)
 	if handle == nil {
 		return fmt.Errorf("failed to load %s: %v", IMDPath, C.GoString(C.dlerror()))
 	}
-	ref := C.dlsym(handle, C.CString(IMDReferenceSymbol))
+	ref := C.dlsym(handle, C.CString(offs.ReferenceSymbol))
 	if ref == nil {
-		return fmt.Errorf("failed to find %s at %x: %v", IMDReferenceSymbol, IMDReferenceAddress, C.GoString(C.dlerror()))
+		return fmt.Errorf("failed to find %s at %x: %v", offs.ReferenceSymbol, offs.ReferenceAddress, C.GoString(C.dlerror()))
 	}
-	base := unsafe.Add(unsafe.Pointer(ref), -IMDReferenceAddress)
-	nacInitAddr = unsafe.Add(base, IMDNACInitAddress)
-	nacKeyEstablishmentAddr = unsafe.Add(base, IMDNACKeyEstablishmentAdddress)
-	nacSignAddr = unsafe.Add(base, IMDNACSignAddress)
+	base := unsafe.Add(unsafe.Pointer(ref), -offs.ReferenceAddress)
+	nacInitAddr = unsafe.Add(base, offs.NACInitAddress)
+	nacKeyEstablishmentAddr = unsafe.Add(base, offs.NACKeyEstablishmentAddress)
+	nacSignAddr = unsafe.Add(base, offs.NACSignAddress)
 	return nil
 }
 
