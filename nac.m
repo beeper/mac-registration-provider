@@ -8,25 +8,20 @@ void *BASE;
 // Loads the IMDAppleServices framework and calculates the base address
 void NACLoad() {
   if (!HANDLE) {
-    NSLog(@"Loading framework %s...", IMD_PATH);
     HANDLE = dlopen(IMD_PATH, RTLD_LAZY);
     if (!HANDLE) {
       NSLog(@"dlopen failed: %s", dlerror());
       exit(-1);
     }
-    NSLog(@"Successfully loaded %s", IMD_PATH);
   }
 
   if (!BASE) {
-    NSLog(@"Using reference symbol %s at %p to calculate base address...",
-          IMD_REF_SYM, (void *)IMD_REF_ADDR);
     void *ref = dlsym(HANDLE, IMD_REF_SYM);
     if (!ref) {
-      NSLog(@"dlsym failed: %s", dlerror());
+      NSLog(@"dlsym failed for symbol %s at %p: %s", IMD_REF_SYM, (void *)IMD_REF_ADDR, dlerror());
       exit(-1);
     }
     BASE = ref - IMD_REF_ADDR;
-    NSLog(@"Calculated base address: %p", BASE);
   }
 }
 
