@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -29,17 +31,23 @@ var submitURL = flag.String("url", "", "URL to submit validation data to")
 var submitToken = flag.String("token", "", "Token to include when submitting validation data")
 var submitInterval = flag.Duration("interval", 5*time.Minute, "Interval at which to submit new validation data to the server")
 var submitUserAgent = fmt.Sprintf("nacserv-native/%s go/%s macOS/%s", Version, strings.TrimPrefix(runtime.Version(), "go"), versions.Current.SoftwareVersion)
+var once = flag.Bool("once", false, "Generate a single validation data, print it to stdout and exit")
 
 func main() {
 	flag.Parse()
-	parsedURL, err := url.Parse(*submitURL)
-	if err != nil {
-		panic(fmt.Errorf("failed to parse input URL: %w", err))
-	} else if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
-		panic(fmt.Errorf("unexpected URL scheme %q", parsedURL.Scheme))
+	if !*once {
+		parsedURL, err := url.Parse(*submitURL)
+		if err != nil {
+			panic(fmt.Errorf("failed to parse input URL: %w", err))
+		} else if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+			panic(fmt.Errorf("unexpected URL scheme %q", parsedURL.Scheme))
+		}
+	} else {
+		log.SetOutput(io.Discard)
 	}
+
 	log.Println("Running sanity check...")
-	err = initSanityCheck()
+	err := initSanityCheck()
 	if err != nil {
 		panic(err)
 	}
@@ -49,6 +57,14 @@ func main() {
 		panic(err)
 	}
 	log.Println("Initialization complete")
+	if *once {
+		validationData, err := generateValidationData(context.Background())
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(base64.StdEncoding.EncodeToString(validationData))
+		return
+	}
 	for {
 		log.Println("Generating validation data...")
 		if validationData, err := generateValidationData(context.Background()); err != nil {
