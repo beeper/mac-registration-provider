@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -13,23 +16,71 @@ import (
 	"github.com/beeper/nacserv-native/versions"
 )
 
-func main() {
-	_ = json.NewEncoder(os.Stderr).Encode(&versions.Current)
+type ReqSubmitValidationData struct {
+	ValidationData []byte            `json:"validation_data"`
+	DeviceInfo     versions.Versions `json:"device_info"`
+}
 
-	err := initSanityCheck()
+const submitInterval = 5 * time.Minute
+
+func main() {
+	if len(os.Args) < 2 {
+		_, _ = fmt.Fprintln(os.Stderr, "Usage: nacserv-native <url>")
+		os.Exit(2)
+	}
+	submitURL := os.Args[len(os.Args)-1]
+	parsedURL, err := url.Parse(submitURL)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse input URL: %w", err))
+	} else if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		panic(fmt.Errorf("unexpected URL scheme %q", parsedURL.Scheme))
+	}
+	log.Println("Running sanity check...")
+	err = initSanityCheck()
 	if err != nil {
 		panic(err)
 	}
+	log.Println("Fetching certificate...")
 	err = initFetchCert(context.Background())
 	if err != nil {
 		panic(err)
 	}
-	validationData, err := generateValidationData()
-	if err != nil {
-		panic(err)
+	log.Println("Initialization complete")
+	for {
+		log.Println("Generating validation data...")
+		if validationData, err := generateValidationData(context.Background()); err != nil {
+			log.Printf("Failed to generate validation data: %v", err)
+		} else if err = submitValidationData(context.Background(), submitURL, validationData); err != nil {
+			log.Printf("Failed to submit validation data: %v", err)
+		} else {
+			log.Println("Successfully generated and submitted validation data")
+		}
+		time.Sleep(submitInterval)
 	}
+}
 
-	fmt.Println(base64.StdEncoding.EncodeToString(validationData))
+func submitValidationData(ctx context.Context, submitURL string, data []byte) error {
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(&ReqSubmitValidationData{ValidationData: data, DeviceInfo: versions.Current})
+	if err != nil {
+		return fmt.Errorf("failed to encode request payload: %w", err)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, submitURL, &buf)
+	if err != nil {
+		return fmt.Errorf("failed to prepare request: %w", err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	_ = resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
+	return nil
 }
 
 var globalCert []byte
@@ -51,15 +102,17 @@ func initSanityCheck() error {
 	return nac.SanityCheck()
 }
 
-func generateValidationData() ([]byte, error) {
+func generateValidationData(ctx context.Context) ([]byte, error) {
 	defer nac.MeowMemory()()
 
-	ctx := context.Background()
 	validationCtx, request, err := nac.Init(globalCert)
 	if err != nil {
 		return nil, err
 	}
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
 	sessionInfo, err := requests.InitializeValidation(ctx, request)
+	cancel()
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize validation: %w", err)
 	}
