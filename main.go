@@ -11,8 +11,10 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/beeper/nacserv-native/nac"
@@ -27,24 +29,27 @@ type ReqSubmitValidationData struct {
 
 const Version = "0.1.0"
 
-var submitURL = flag.String("url", "", "URL to submit validation data to")
 var submitToken = flag.String("token", "", "Token to include when submitting validation data")
-var submitInterval = flag.Duration("interval", 5*time.Minute, "Interval at which to submit new validation data to the server")
+var submitInterval = flag.Duration("interval", 3*time.Minute, "Interval at which to submit new validation data to the server")
 var submitUserAgent = fmt.Sprintf("nacserv-native/%s go/%s macOS/%s", Version, strings.TrimPrefix(runtime.Version(), "go"), versions.Current.SoftwareVersion)
 var once = flag.Bool("once", false, "Generate a single validation data, print it to stdout and exit")
 
 func main() {
 	flag.Parse()
+	var urls []string
 	if !*once {
-		if len(*submitURL) == 0 {
-			flag.Usage()
+		urls = flag.Args()
+		if len(urls) == 0 {
+			_, _ = fmt.Fprintln(os.Stderr, "You must pass one or more URLs to submit to when not using -once")
 			return
 		}
-		parsedURL, err := url.Parse(*submitURL)
-		if err != nil {
-			panic(fmt.Errorf("failed to parse input URL: %w", err))
-		} else if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
-			panic(fmt.Errorf("unexpected URL scheme %q", parsedURL.Scheme))
+		for _, u := range urls {
+			parsedURL, err := url.Parse(u)
+			if err != nil {
+				panic(fmt.Errorf("failed to parse input URL %q: %w", u, err))
+			} else if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+				panic(fmt.Errorf("unexpected URL scheme %q", parsedURL.Scheme))
+			}
 		}
 	} else {
 		log.SetOutput(io.Discard)
@@ -78,25 +83,40 @@ func main() {
 		log.Println("Generating validation data...")
 		if validationData, err := generateValidationData(context.Background()); err != nil {
 			log.Printf("Failed to generate validation data: %v", err)
-		} else if err = submitValidationData(context.Background(), validationData); err != nil {
-			log.Printf("Failed to submit validation data: %v", err)
 		} else {
-			log.Println("Successfully generated and submitted validation data")
+			submitValidationDataToURLs(context.Background(), urls, validationData)
 		}
 		time.Sleep(*submitInterval)
 	}
 }
 
-func submitValidationData(ctx context.Context, data []byte) error {
+func submitValidationDataToURLs(ctx context.Context, urls []string, data []byte) {
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
+	var wg sync.WaitGroup
+	wg.Add(len(urls))
+	for _, u := range urls {
+		go func(addr string) {
+			defer wg.Done()
+			err := submitValidationData(ctx, addr, data)
+			if err != nil {
+				log.Printf("Failed to submit validation data to %s: %v", addr, err)
+			} else {
+				log.Println("Submitted validation data to", addr)
+			}
+		}(u)
+	}
+	wg.Wait()
+}
+
+func submitValidationData(ctx context.Context, url string, data []byte) error {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(&ReqSubmitValidationData{ValidationData: data, DeviceInfo: versions.Current})
 	if err != nil {
 		return fmt.Errorf("failed to encode request payload: %w", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, *submitURL, &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, &buf)
 	if err != nil {
 		return fmt.Errorf("failed to prepare request: %w", err)
 	}
