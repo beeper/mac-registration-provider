@@ -121,6 +121,7 @@ func submitValidationData(ctx context.Context, url string, data []byte) error {
 		return fmt.Errorf("failed to prepare request: %w", err)
 	}
 	req.Header.Set("User-Agent", submitUserAgent)
+	req.Header.Set("Content-Type", "application/json")
 	if len(*submitToken) > 0 {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *submitToken))
 	}
