@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -76,7 +75,10 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(base64.StdEncoding.EncodeToString(validationData))
+		_ = json.NewEncoder(os.Stdout).Encode(&ReqSubmitValidationData{
+			ValidationData: validationData,
+			DeviceInfo:     versions.Current,
+		})
 		return
 	}
 	for {
