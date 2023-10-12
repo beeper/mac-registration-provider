@@ -23,6 +23,7 @@ import (
 
 type ReqSubmitValidationData struct {
 	ValidationData []byte            `json:"validation_data"`
+	ValidUntil     time.Time         `json:"valid_until"`
 	DeviceInfo     versions.Versions `json:"device_info"`
 }
 
@@ -71,28 +72,29 @@ func main() {
 	}
 	log.Println("Initialization complete")
 	if *once {
-		validationData, err := generateValidationData(context.Background())
+		validationData, validUntil, err := generateValidationData(context.Background())
 		if err != nil {
 			panic(err)
 		}
 		_ = json.NewEncoder(os.Stdout).Encode(&ReqSubmitValidationData{
 			ValidationData: validationData,
+			ValidUntil:     validUntil,
 			DeviceInfo:     versions.Current,
 		})
 		return
 	}
 	for {
 		log.Println("Generating validation data...")
-		if validationData, err := generateValidationData(context.Background()); err != nil {
+		if validationData, validUntil, err := generateValidationData(context.Background()); err != nil {
 			log.Printf("Failed to generate validation data: %v", err)
 		} else {
-			submitValidationDataToURLs(context.Background(), urls, validationData)
+			submitValidationDataToURLs(context.Background(), urls, validationData, validUntil)
 		}
 		time.Sleep(*submitInterval)
 	}
 }
 
-func submitValidationDataToURLs(ctx context.Context, urls []string, data []byte) {
+func submitValidationDataToURLs(ctx context.Context, urls []string, data []byte, validUntil time.Time) {
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
@@ -101,7 +103,7 @@ func submitValidationDataToURLs(ctx context.Context, urls []string, data []byte)
 	for _, u := range urls {
 		go func(addr string) {
 			defer wg.Done()
-			err := submitValidationData(ctx, addr, data)
+			err := submitValidationData(ctx, addr, data, validUntil)
 			if err != nil {
 				log.Printf("Failed to submit validation data to %s: %v", addr, err)
 			} else {
@@ -112,9 +114,13 @@ func submitValidationDataToURLs(ctx context.Context, urls []string, data []byte)
 	wg.Wait()
 }
 
-func submitValidationData(ctx context.Context, url string, data []byte) error {
+func submitValidationData(ctx context.Context, url string, data []byte, validUntil time.Time) error {
 	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(&ReqSubmitValidationData{ValidationData: data, DeviceInfo: versions.Current})
+	err := json.NewEncoder(&buf).Encode(&ReqSubmitValidationData{
+		ValidationData: data,
+		ValidUntil:     validUntil,
+		DeviceInfo:     versions.Current,
+	})
 	if err != nil {
 		return fmt.Errorf("failed to encode request payload: %w", err)
 	}
@@ -157,27 +163,31 @@ func initSanityCheck() error {
 	return nac.SanityCheck()
 }
 
-func generateValidationData(ctx context.Context) ([]byte, error) {
+const ValidityTime = 15 * time.Minute
+
+func generateValidationData(ctx context.Context) ([]byte, time.Time, error) {
 	defer nac.MeowMemory()()
 
 	validationCtx, request, err := nac.Init(globalCert)
 	if err != nil {
-		return nil, err
+		return nil, time.Time{}, err
 	}
 	var cancel context.CancelFunc
 	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+	// Record valid until time before request, so it's definitely valid for at least that long
+	validUntil := time.Now().UTC().Add(ValidityTime)
 	sessionInfo, err := requests.InitializeValidation(ctx, request)
 	cancel()
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize validation: %w", err)
+		return nil, validUntil, fmt.Errorf("failed to initialize validation: %w", err)
 	}
 	err = nac.KeyEstablishment(validationCtx, sessionInfo)
 	if err != nil {
-		return nil, err
+		return nil, validUntil, err
 	}
 	validationData, err := nac.Sign(validationCtx)
 	if err != nil {
-		return nil, err
+		return nil, validUntil, err
 	}
-	return validationData, nil
+	return validationData, validUntil, nil
 }
