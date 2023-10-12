@@ -16,9 +16,7 @@ import (
 	"unsafe"
 )
 
-const (
-	IMDPath = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
-)
+const identityservicesd = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
 
 var nacInitAddr, nacKeyEstablishmentAddr, nacSignAddr unsafe.Pointer
 
@@ -36,7 +34,7 @@ func sha256sum(path string) (hash [32]byte, err error) {
 }
 
 func Load() error {
-	hash, err := sha256sum(IMDPath)
+	hash, err := sha256sum(identityservicesd)
 	if err != nil {
 		return err
 	}
@@ -45,9 +43,9 @@ func Load() error {
 		return fmt.Errorf("no offsets for %x", hash[:])
 	}
 
-	handle := C.dlopen(C.CString(IMDPath), C.RTLD_LAZY)
+	handle := C.dlopen(C.CString(identityservicesd), C.RTLD_LAZY)
 	if handle == nil {
-		return fmt.Errorf("failed to load %s: %v", IMDPath, C.GoString(C.dlerror()))
+		return fmt.Errorf("failed to load %s: %v", identityservicesd, C.GoString(C.dlerror()))
 	}
 	ref := C.dlsym(handle, C.CString(offs.ReferenceSymbol))
 	if ref == nil {
