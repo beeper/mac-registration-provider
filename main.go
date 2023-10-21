@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -84,14 +85,31 @@ func main() {
 		return
 	}
 	for {
-		log.Println("Generating validation data...")
-		if validationData, validUntil, err := generateValidationData(context.Background()); err != nil {
-			log.Printf("Failed to generate validation data: %v", err)
-		} else {
-			submitValidationDataToURLs(context.Background(), urls, validationData, validUntil)
-		}
-		time.Sleep(*submitInterval)
+		generateAndSubmit(urls)
 	}
+}
+
+var panicCounter = 0
+
+func generateAndSubmit(urls []string) {
+	defer func() {
+		err := recover()
+		if err != nil {
+			panicCounter++
+			log.Printf("Panic while generating validation data: %v\n%s", err, debug.Stack())
+			sleepDuration := time.Duration(panicCounter) * 5 * time.Minute
+			log.Println("Sleeping for", sleepDuration)
+			time.Sleep(sleepDuration)
+		}
+	}()
+	log.Println("Generating validation data...")
+	if validationData, validUntil, err := generateValidationData(context.Background()); err != nil {
+		log.Printf("Failed to generate validation data: %v", err)
+	} else {
+		submitValidationDataToURLs(context.Background(), urls, validationData, validUntil)
+	}
+	panicCounter = 0
+	time.Sleep(*submitInterval)
 }
 
 func submitValidationDataToURLs(ctx context.Context, urls []string, data []byte, validUntil time.Time) {
