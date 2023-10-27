@@ -3,6 +3,7 @@ package versions
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -16,6 +17,7 @@ type Versions struct {
 	SoftwareBuildID string `json:"software_build_id"`
 
 	SerialNumber string `json:"serial_number"`
+	Hostname     string `json:"hostname"`
 }
 
 func (v *Versions) UserAgent() string {
@@ -36,6 +38,11 @@ func getSerialNumber() string {
 		panic(fmt.Errorf("error running system_profiler: %w", err))
 	}
 	return gjson.GetBytes(data, "SPHardwareDataType.0.serial_number").Str
+}
+
+func getHostname() string {
+	hostname, _ := os.Hostname()
+	return hostname
 }
 
 func Get() Versions {
@@ -59,6 +66,7 @@ func Get() Versions {
 		SoftwareBuildID: string(outParts[1]),
 
 		SerialNumber: getSerialNumber(),
+		Hostname:     getHostname(),
 	}
 }
 
