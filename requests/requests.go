@@ -90,8 +90,8 @@ func InitializeValidation(ctx context.Context, request []byte) (sessionInfo []by
 	defer func() {
 		if err != nil && respData != nil {
 			var rawData map[string]any
-			_, err = plist.Unmarshal(respData, &rawData)
-			if err == nil {
+			_, plistErr := plist.Unmarshal(respData, &rawData)
+			if plistErr == nil {
 				log.Printf("Plist response data of errored request: %+v", rawData)
 			} else {
 				log.Printf("Raw response data of errored request: %s", base64.StdEncoding.EncodeToString(respData))
