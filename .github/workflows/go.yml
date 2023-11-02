@@ -8,7 +8,12 @@ env:
 
 jobs:
   build:
-    runs-on: macos-13-xlarge
+    runs-on: ${{ strategy.runner }}
+
+    strategy:
+      matrix:
+        runner: [macos-13-xlarge, macos-13]
+
     steps:
       - uses: actions/checkout@v3
 
