@@ -7,7 +7,7 @@ env:
   GO_VERSION: "1.21"
 
 jobs:
-  build arm64:
+  build-arm64:
     runs-on: macos-13-xlarge
 
     steps:
@@ -40,7 +40,7 @@ jobs:
           path: nacserv-native
           if-no-files-found: error
 
-  build x86:
+  build-x86:
     runs-on: macos-13
 
     steps:
