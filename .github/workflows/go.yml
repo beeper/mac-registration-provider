@@ -36,7 +36,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: nacserv-native
+          name: nacserv-native-arm64
           path: nacserv-native
           if-no-files-found: error
 
@@ -57,6 +57,6 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: nacserv-native
+          name: nacserv-native-x86
           path: nacserv-native
           if-no-files-found: error
