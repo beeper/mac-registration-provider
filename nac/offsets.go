@@ -32,7 +32,11 @@ var offsets = map[[32]byte]imdOffsets{
 	},
 	// macOS 14.0
 	hexToByte32("9ffda11206ef874b1e6cb1d8f8fed330d2ac2cbbc87afc15485f4e4371afcd9a"): {
-		// TODO
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0xc00ec,
+		NACInitAddress:             0x4af610,
+		NACKeyEstablishmentAddress: 0x49ce74,
+		NACSignAddress:             0x477080,
 	},
 	// macOS 14.1
 	hexToByte32("2483dc690217e959d386ae4573bacb8d669f3c0a666b1874ebfcb8131a9c18d7"): {
