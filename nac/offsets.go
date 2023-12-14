@@ -14,6 +14,14 @@ var offsetsx86_11_7_7 = imdOffsets{
 	NACSignAddress:             0x3c71a0,
 }
 
+var offsetsarm_13_6 = imdOffsets{
+	ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+	ReferenceAddress:           0xb524c,
+	NACInitAddress:             0x41d714,
+	NACKeyEstablishmentAddress: 0x40af78,
+	NACSignAddress:             0x3e5184,
+}
+
 // offsets is a map from sha256 hash of identityservicesd to the function pointer offsets in that binary.
 var offsets = map[[32]byte]imdOffsets{
 	// macOS 11.5.1
@@ -23,13 +31,9 @@ var offsets = map[[32]byte]imdOffsets{
 	// macOS 11.7.7
 	hexToByte32("80107d249088d9762ec38c8f86d6797b5070d476377e7c5ddacf83ad32d00a1e"): offsetsx86_11_7_7,
 	// macOS 13.5 - 13.6 (possibly earlier versions too) - arm64
-	hexToByte32("fff8db27fef2a2b874f7bc6fb303a98e3e3b8aceb8dd4c5bfa2bad7b76ea438a"): {
-		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-		ReferenceAddress:           0xb524c,
-		NACInitAddress:             0x41d714,
-		NACKeyEstablishmentAddress: 0x40af78,
-		NACSignAddress:             0x3e5184,
-	},
+	hexToByte32("fff8db27fef2a2b874f7bc6fb303a98e3e3b8aceb8dd4c5bfa2bad7b76ea438a"): offsetsarm_13_6,
+	// macOS 13.6.3
+	hexToByte32("2c674438d30bf489695f2d1b8520afc30cbfb183af82d2fc53d74ce39a25b24e"): offsetsarm_13_6,
 	// macOS 14.0
 	hexToByte32("9ffda11206ef874b1e6cb1d8f8fed330d2ac2cbbc87afc15485f4e4371afcd9a"): {
 		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
