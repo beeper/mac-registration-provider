@@ -136,7 +136,7 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		return err
 	}
 
-	c, _, err := websocket.Dial(ctx, addr, &websocket.DialOptions{
+	c, _, err := websocket.Dial(ctx, addr+"/api/v1/provider", &websocket.DialOptions{
 		HTTPHeader: http.Header{
 			"User-Agent": []string{submitUserAgent},
 		},
@@ -162,7 +162,7 @@ func ConnectRelay(ctx context.Context, addr string) error {
 	if err != nil {
 		return fmt.Errorf("failed to read register response: %w", err)
 	} else if registerResp.Command != "response" || registerResp.ReqID != 1 {
-		return fmt.Errorf("unexpected register response")
+		return fmt.Errorf("unexpected register response %+v", registerResp)
 	}
 
 	if config.Code == "" || config.Code != registerResp.Data.Code {
