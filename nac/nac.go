@@ -41,8 +41,13 @@ func Load() error {
 	if err != nil {
 		return err
 	}
-	offs, ok := offsets[hash]
-	if !ok || offs.ReferenceSymbol == "" {
+	var offs imdOffsets
+	if runtime.GOARCH == "arm64" {
+		offs = offsets[hash].arm64
+	} else {
+		offs = offsets[hash].x86
+	}
+	if offs.ReferenceSymbol == "" {
 		return fmt.Errorf("%w for %x", ErrNoOffsets, hash[:])
 	}
 
