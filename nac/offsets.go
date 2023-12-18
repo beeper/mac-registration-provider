@@ -30,6 +30,14 @@ var offsets = map[[32]byte]imdOffsets{
 	hexToByte32("f3467734b116f78c22cbe43217d7a337d3cf4dbbc58c0dde81f90dfa19d22e91"): offsetsx86_11_7_7,
 	// macOS 11.7.7
 	hexToByte32("80107d249088d9762ec38c8f86d6797b5070d476377e7c5ddacf83ad32d00a1e"): offsetsx86_11_7_7,
+	// macOS 12.6.3
+	hexToByte32("6e8caf477c2b4d3a56a91835a2b6455f36fb0feb13006def7516ac09578c67d0"): {
+		// TODO
+	},
+	// macOS 13.2.1
+	hexToByte32("4d96de9438fdea5b0b7121e485541ecf0a74489eeb330c151a7d44d289dd3a85"): {
+		// TODO
+	},
 	// macOS 13.5 - 13.6 (possibly earlier versions too) - arm64
 	hexToByte32("fff8db27fef2a2b874f7bc6fb303a98e3e3b8aceb8dd4c5bfa2bad7b76ea438a"): offsetsarm_13_6,
 	// macOS 13.6.3
@@ -48,10 +56,6 @@ var offsets = map[[32]byte]imdOffsets{
 	},
 	// macOS 14.2
 	hexToByte32("034fc179e1cce559931a8e46866f54154cb1c5413902319473537527a2702b64"): {
-		// TODO
-	},
-	// macOS 14.2.1 (may be same as 14.2)
-	hexToByte32("4d96de9438fdea5b0b7121e485541ecf0a74489eeb330c151a7d44d289dd3a85"): {
 		// TODO
 	},
 }
