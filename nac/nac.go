@@ -9,6 +9,7 @@ package nac
 import "C"
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -33,6 +34,8 @@ func sha256sum(path string) (hash [32]byte, err error) {
 	return
 }
 
+var ErrNoOffsets = errors.New("no offsets")
+
 func Load() error {
 	hash, err := sha256sum(identityservicesd)
 	if err != nil {
@@ -40,7 +43,7 @@ func Load() error {
 	}
 	offs, ok := offsets[hash]
 	if !ok || offs.ReferenceSymbol == "" {
-		return fmt.Errorf("no offsets for %x", hash[:])
+		return fmt.Errorf("%w for %x", ErrNoOffsets, hash[:])
 	}
 
 	handle := C.dlopen(C.CString(identityservicesd), C.RTLD_LAZY)

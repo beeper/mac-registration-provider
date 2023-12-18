@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/tidwall/gjson v1.17.0
 	howett.net/plist v1.0.0
+	nhooyr.io/websocket v1.8.10
 )
 
 require (

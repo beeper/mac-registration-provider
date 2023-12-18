@@ -16,8 +16,9 @@ type Versions struct {
 	SoftwareVersion string `json:"software_version"`
 	SoftwareBuildID string `json:"software_build_id"`
 
-	SerialNumber string `json:"serial_number"`
-	Hostname     string `json:"hostname"`
+	SerialNumber   string `json:"serial_number"`
+	UniqueDeviceID string `json:"unique_device_id,omitempty"`
+	Hostname       string `json:"hostname"`
 }
 
 func (v *Versions) UserAgent() string {
@@ -32,12 +33,13 @@ func getSoftwareName() string {
 	return strings.TrimSpace(string(softwareName))
 }
 
-func getSerialNumber() string {
+func getSerialNumber() (serial, uuid string) {
 	data, err := exec.Command("system_profiler", "SPHardwareDataType", "-json").Output()
 	if err != nil {
 		panic(fmt.Errorf("error running system_profiler: %w", err))
 	}
-	return gjson.GetBytes(data, "SPHardwareDataType.0.serial_number").Str
+	return gjson.GetBytes(data, "SPHardwareDataType.0.serial_number").Str,
+		gjson.GetBytes(data, "SPHardwareDataType.0.platform_UUID").Str
 }
 
 func getHostname() string {
@@ -59,14 +61,16 @@ func Get() Versions {
 	if len(outParts) != 4 || len(outParts[3]) != 0 {
 		panic(fmt.Errorf("unexpected output from sysctl: %q", string(output)))
 	}
+	serialNumber, deviceUUID := getSerialNumber()
 	return Versions{
 		HardwareVersion: string(outParts[0]),
 		SoftwareName:    getSoftwareName(),
 		SoftwareVersion: string(outParts[2]),
 		SoftwareBuildID: string(outParts[1]),
 
-		SerialNumber: getSerialNumber(),
-		Hostname:     getHostname(),
+		SerialNumber:   serialNumber,
+		UniqueDeviceID: deviceUUID,
+		Hostname:       getHostname(),
 	}
 }
 
