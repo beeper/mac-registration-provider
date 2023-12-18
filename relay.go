@@ -12,7 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mdp/qrterminal"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 
@@ -176,10 +175,12 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		}
 	}
 
-	fmt.Println("--------------------------------------------------------------------------------")
-	qrterminal.GenerateHalfBlock(fmt.Sprintf("beeper://imrelay/%s", registerResp.Data.Code), qrterminal.L, os.Stdout)
-	fmt.Println("Registration token:", registerResp.Data.Code)
-	fmt.Println("--------------------------------------------------------------------------------")
+	//qrterminal.GenerateHalfBlock(fmt.Sprintf("beeper://imrelay/%s", registerResp.Data.Code), qrterminal.L, os.Stdout)
+	fmt.Println()
+	fmt.Println(" ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+	fmt.Println(" ┃ Registration token:", registerResp.Data.Code, "┃")
+	fmt.Println(" ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
+	fmt.Println()
 	fmt.Println("Delete", configPath, "if you want to regenerate the token")
 
 	log.Printf("Connection successful")
