@@ -175,13 +175,19 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		}
 	}
 
-	//qrterminal.GenerateHalfBlock(fmt.Sprintf("beeper://imrelay/%s", registerResp.Data.Code), qrterminal.L, os.Stdout)
-	fmt.Println()
-	fmt.Println(" ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
-	fmt.Println(" ┃ iMessage registration code:", registerResp.Data.Code, "┃")
-	fmt.Println(" ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
-	fmt.Println()
-	fmt.Println("Delete", configPath, "if you want to regenerate the token")
+	if *jsonOutput {
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
+			"code": registerResp.Data.Code,
+			"path": configPath,
+		})
+	} else {
+		fmt.Println()
+		fmt.Println(" ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+		fmt.Println(" ┃ iMessage registration code:", registerResp.Data.Code, "┃")
+		fmt.Println(" ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
+		fmt.Println()
+		fmt.Println("Delete", configPath, "if you want to regenerate the token")
+	}
 
 	log.Printf("Connection successful")
 	for {

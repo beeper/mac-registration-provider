@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -28,6 +29,7 @@ var Commit = "unknown "
 var submitToken = flag.String("submit-token", "", "Token to include when submitting validation data")
 var submitInterval = flag.Duration("submit-interval", 0, "Interval at which to submit new validation data to the server")
 var relayServer = flag.String("relay-server", "https://imrelay.beeper.com", "URL of the relay server to use")
+var jsonOutput = flag.Bool("json", false, "Output JSON instead of text")
 var submitUserAgent = fmt.Sprintf("mac-validation-provider/%s go/%s macOS/%s", Commit[:8], strings.TrimPrefix(runtime.Version(), "go"), versions.Current.SoftwareVersion)
 var once = flag.Bool("once", false, "Generate a single validation data, print it to stdout and exit")
 
@@ -54,6 +56,12 @@ func main() {
 	log.Println("Loading identityservicesd")
 	err := nac.Load()
 	if err != nil {
+		if *jsonOutput && errors.Is(err, nac.ErrNoOffsets) {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
+				"error": "no offsets",
+			})
+			return
+		}
 		panic(err)
 	}
 	log.Println("Running sanity check...")
