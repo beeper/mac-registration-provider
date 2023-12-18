@@ -177,9 +177,9 @@ func ConnectRelay(ctx context.Context, addr string) error {
 
 	//qrterminal.GenerateHalfBlock(fmt.Sprintf("beeper://imrelay/%s", registerResp.Data.Code), qrterminal.L, os.Stdout)
 	fmt.Println()
-	fmt.Println(" ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
-	fmt.Println(" ┃ Registration token:", registerResp.Data.Code, "┃")
-	fmt.Println(" ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
+	fmt.Println(" ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+	fmt.Println(" ┃ iMessage registration code:", registerResp.Data.Code, "┃")
+	fmt.Println(" ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
 	fmt.Println()
 	fmt.Println("Delete", configPath, "if you want to regenerate the token")
 
