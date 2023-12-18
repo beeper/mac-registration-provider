@@ -42,8 +42,16 @@ var offsets = map[[32]byte]imdOffsets{
 		NACKeyEstablishmentAddress: 0x49ce74,
 		NACSignAddress:             0x477080,
 	},
-	// macOS 14.1
+	// macOS 14.1 (-14.1.2)
 	hexToByte32("2483dc690217e959d386ae4573bacb8d669f3c0a666b1874ebfcb8131a9c18d7"): {
+		// TODO
+	},
+	// macOS 14.2
+	hexToByte32("034fc179e1cce559931a8e46866f54154cb1c5413902319473537527a2702b64"): {
+		// TODO
+	},
+	// macOS 14.2.1 (may be same as 14.2)
+	hexToByte32("4d96de9438fdea5b0b7121e485541ecf0a74489eeb330c151a7d44d289dd3a85"): {
 		// TODO
 	},
 }
