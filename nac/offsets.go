@@ -30,6 +30,14 @@ var offsets_14_0 = imdOffsetTuple{arm64: imdOffsets{
 	NACSignAddress:             0x477080,
 }}
 
+var offsets_14_2 = imdOffsetTuple{arm64: imdOffsets{
+	ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+	ReferenceAddress:           0xbd9f0,
+	NACInitAddress:             0x4b55a0,
+	NACKeyEstablishmentAddress: 0x4a2e04,
+	NACSignAddress:             0x47d010,
+}}
+
 // offsets is a map from sha256 hash of identityservicesd to the function pointer offsets in that binary.
 var offsets = map[[32]byte]imdOffsetTuple{
 	// macOS 11.5.1
@@ -51,7 +59,7 @@ var offsets = map[[32]byte]imdOffsetTuple{
 	// macOS 14.1 - 14.1.2
 	hexToByte32("2483dc690217e959d386ae4573bacb8d669f3c0a666b1874ebfcb8131a9c18d7"): {},
 	// macOS 14.2
-	hexToByte32("034fc179e1cce559931a8e46866f54154cb1c5413902319473537527a2702b64"): {},
+	hexToByte32("034fc179e1cce559931a8e46866f54154cb1c5413902319473537527a2702b64"): offsets_14_2,
 }
 
 type imdOffsetTuple struct {
