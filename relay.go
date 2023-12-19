@@ -61,12 +61,7 @@ func cachedGenerateData(ctx context.Context) (ValidationDataResponse, error) {
 
 func handleCommand(ctx context.Context, req WebsocketRequest[json.RawMessage]) (any, error) {
 	switch req.Command {
-	case "register":
-		var body RegisterBody
-		err := json.Unmarshal(req.Data, &body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse register body: %v", err)
-		}
+	case "pong":
 		return nil, nil
 	case "ping":
 		// Pre-cache validation data on ping
@@ -220,6 +215,8 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		if err != nil {
 			log.Printf("Command %s/%d failed: %v", req.Command, req.ReqID, err)
 			resp = ErrorResponse{Error: err.Error()}
+		} else if resp == nil {
+			continue
 		} else {
 			log.Printf("Command %s/%d succeeded", req.Command, req.ReqID)
 		}
