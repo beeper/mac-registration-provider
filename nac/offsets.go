@@ -30,13 +30,22 @@ var offsets_14_0 = imdOffsetTuple{arm64: imdOffsets{
 	NACSignAddress:             0x477080,
 }}
 
-var offsets_14_2 = imdOffsetTuple{arm64: imdOffsets{
-	ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-	ReferenceAddress:           0xbd9f0,
-	NACInitAddress:             0x4b55a0,
-	NACKeyEstablishmentAddress: 0x4a2e04,
-	NACSignAddress:             0x47d010,
-}}
+var offsets_14_2 = imdOffsetTuple{
+	x86: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0xd4899,
+		NACInitAddress:             0x54c730,
+		NACKeyEstablishmentAddress: 0x52c770,
+		NACSignAddress:             0x53fa60,
+	},
+	arm64: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0xbd9f0,
+		NACInitAddress:             0x4b55a0,
+		NACKeyEstablishmentAddress: 0x4a2e04,
+		NACSignAddress:             0x47d010,
+	},
+}
 
 // offsets is a map from sha256 hash of identityservicesd to the function pointer offsets in that binary.
 var offsets = map[[32]byte]imdOffsetTuple{
