@@ -1,5 +1,9 @@
 name: "Publish npm package"
 
+on:
+  release:
+    types: [published]
+
 jobs:
   build:
     uses: './.github/workflows/go.yml'
