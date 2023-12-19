@@ -11,7 +11,7 @@ import (
 
 	"howett.net/plist"
 
-	"github.com/beeper/nacserv-native/versions"
+	"github.com/beeper/mac-registration-provider/versions"
 )
 
 var client = &http.Client{}

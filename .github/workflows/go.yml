@@ -23,7 +23,7 @@ jobs:
         run: go build -v -ldflags "-X main.Commit=${{ github.sha }}"
 
       - name: Run the binary
-        run: ./nacserv-native -once
+        run: ./mac-registration-provider -once
 
       - name: Install lint dependencies
         run: |
@@ -36,8 +36,8 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: nacserv-native-arm64
-          path: nacserv-native
+          name: mac-registration-provider-arm64
+          path: mac-registration-provider
           if-no-files-found: error
 
   build-x86:
@@ -57,6 +57,6 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: nacserv-native-x86
-          path: nacserv-native
+          name: mac-registration-provider-x86
+          path: mac-registration-provider
           if-no-files-found: error

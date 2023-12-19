@@ -1,4 +1,4 @@
-module github.com/beeper/nacserv-native
+module github.com/beeper/mac-registration-provider
 
 go 1.21
 

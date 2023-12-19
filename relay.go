@@ -15,7 +15,7 @@ import (
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 
-	"github.com/beeper/nacserv-native/versions"
+	"github.com/beeper/mac-registration-provider/versions"
 )
 
 type WebsocketRequest[T any] struct {

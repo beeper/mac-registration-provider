@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beeper/nacserv-native/versions"
+	"github.com/beeper/mac-registration-provider/versions"
 )
 
 var panicCounter = 0

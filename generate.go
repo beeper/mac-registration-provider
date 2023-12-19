@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/beeper/nacserv-native/nac"
-	"github.com/beeper/nacserv-native/requests"
+	"github.com/beeper/mac-registration-provider/nac"
+	"github.com/beeper/mac-registration-provider/requests"
 )
 
 var globalCert []byte
