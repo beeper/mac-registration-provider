@@ -25,7 +25,8 @@ type WebsocketRequest[T any] struct {
 }
 
 type RegisterBody struct {
-	Code string `json:"code,omitempty"`
+	Code   string `json:"code,omitempty"`
+	Secret string `json:"secret,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -84,7 +85,8 @@ func handleCommand(ctx context.Context, req WebsocketRequest[json.RawMessage]) (
 }
 
 type RelayConfig struct {
-	Code string `json:"code"`
+	Code   string `json:"code"`
+	Secret string `json:"secret"`
 }
 
 func readConfig() (string, *RelayConfig, error) {
@@ -144,7 +146,8 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		Command: "register",
 		ReqID:   1,
 		Data: &RegisterBody{
-			Code: config.Code,
+			Code:   config.Code,
+			Secret: config.Secret,
 		},
 	})
 	if err != nil {
@@ -164,6 +167,7 @@ func ConnectRelay(ctx context.Context, addr string) error {
 			log.Println("Registration token changed")
 		}
 		config.Code = registerResp.Data.Code
+		config.Secret = registerResp.Data.Secret
 		err = writeConfig(config, configPath)
 		if err != nil {
 			return fmt.Errorf("failed to write config: %w", err)
