@@ -68,3 +68,10 @@ jobs:
       - uses: actions/download-artifact@v3
       - name: show contents
         run: ls -lR
+      - name: Build universal binary
+        run: lipo -create -output mac-registration-provider-universal mac-registration-provider-x86/mac-registration-provider mac-registration-provider-arm64/mac-registration-provider
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mac-registration-provider-universal
+          path: mac-registration-provider-universal
+          if-no-files-found: error
