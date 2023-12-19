@@ -27,6 +27,7 @@ type WebsocketRequest[T any] struct {
 type RegisterBody struct {
 	Code   string `json:"code,omitempty"`
 	Secret string `json:"secret,omitempty"`
+	Error  string `json:"error,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -160,6 +161,9 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		return fmt.Errorf("failed to read register response: %w", err)
 	} else if registerResp.Command != "response" || registerResp.ReqID != 1 {
 		return fmt.Errorf("unexpected register response %+v", registerResp)
+	} else if registerResp.Data.Error != "" {
+		_ = os.Rename(configPath, configPath+".bak")
+		return fmt.Errorf("failed to register: %s", registerResp.Data.Error)
 	}
 
 	if config.Code == "" || config.Code != registerResp.Data.Code {

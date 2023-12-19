@@ -106,6 +106,8 @@ func main() {
 			err = ConnectRelay(context.Background(), *relayServer)
 			if err == nil {
 				break
+			} else if strings.HasPrefix(err.Error(), "failed to register:") {
+				os.Exit(10)
 			}
 			log.Printf("Error in relay connection: %v, reconnecting in %v", err, reconnectIn)
 			time.Sleep(reconnectIn)
