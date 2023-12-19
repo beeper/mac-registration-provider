@@ -100,9 +100,22 @@ func main() {
 		}
 	} else if len(*relayServer) > 0 {
 		log.Printf("Relay mode: responding to requests over websocket at %s", *relayServer)
-		err = ConnectRelay(context.Background(), *relayServer)
-		if err != nil {
-			log.Printf("Error in relay connection: %v", err)
+		reconnectIn := 2 * time.Second
+		lastReconnect := time.Now()
+		for {
+			err = ConnectRelay(context.Background(), *relayServer)
+			if err == nil {
+				break
+			}
+			log.Printf("Error in relay connection: %v, reconnecting in %v", err, reconnectIn)
+			time.Sleep(reconnectIn)
+			if time.Since(lastReconnect) < 5*time.Minute {
+				if reconnectIn < 1*time.Minute {
+					reconnectIn *= 2
+				}
+			} else {
+				reconnectIn = 2 * time.Second
+			}
 		}
 	}
 }
