@@ -9,6 +9,7 @@ package nac
 import "C"
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -36,13 +37,13 @@ func sha256sum(path string) (hash [32]byte, err error) {
 }
 
 type NoOffsetsError struct {
-	Hash    []byte `json:"hash"`
+	Hash    string `json:"hash"`
 	Version string `json:"version"`
 	Arch    string `json:"arch"`
 }
 
 func (err NoOffsetsError) Error() string {
-	return fmt.Sprintf("no offsets for %s/%s (hash: %x)", err.Version, err.Arch, err.Hash)
+	return fmt.Sprintf("no offsets for %s/%s (hash: %s)", err.Version, err.Arch, err.Hash)
 }
 
 func Load() error {
@@ -58,7 +59,7 @@ func Load() error {
 	}
 	if offs.ReferenceSymbol == "" {
 		return NoOffsetsError{
-			Hash:    hash[:],
+			Hash:    hex.EncodeToString(hash[:]),
 			Version: versions.Current.SoftwareVersion,
 			Arch:    runtime.GOARCH,
 		}
