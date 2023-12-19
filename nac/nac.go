@@ -9,12 +9,13 @@ package nac
 import "C"
 import (
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"runtime"
 	"unsafe"
+
+	"github.com/beeper/nacserv-native/versions"
 )
 
 const identityservicesd = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
@@ -34,7 +35,15 @@ func sha256sum(path string) (hash [32]byte, err error) {
 	return
 }
 
-var ErrNoOffsets = errors.New("no offsets")
+type NoOffsetsError struct {
+	Hash    [32]byte `json:"hash"`
+	Version string   `json:"version"`
+	Arch    string   `json:"arch"`
+}
+
+func (err NoOffsetsError) Error() string {
+	return fmt.Sprintf("no offsets for %s/%s (hash: %x)", err.Version, err.Arch, err.Hash[:])
+}
 
 func Load() error {
 	hash, err := sha256sum(identityservicesd)
@@ -48,7 +57,11 @@ func Load() error {
 		offs = offsets[hash].x86
 	}
 	if offs.ReferenceSymbol == "" {
-		return fmt.Errorf("%w for %x", ErrNoOffsets, hash[:])
+		return NoOffsetsError{
+			Hash:    hash,
+			Version: versions.Current.SoftwareVersion,
+			Arch:    runtime.GOARCH,
+		}
 	}
 
 	handle := C.dlopen(C.CString(identityservicesd), C.RTLD_LAZY)

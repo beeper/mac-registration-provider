@@ -56,10 +56,15 @@ func main() {
 	log.Println("Loading identityservicesd")
 	err := nac.Load()
 	if err != nil {
-		if *jsonOutput && errors.Is(err, nac.ErrNoOffsets) {
-			_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
-				"error": "no offsets",
-			})
+		var noOffsetsErr nac.NoOffsetsError
+		if errors.As(err, &noOffsetsErr) {
+			if *jsonOutput {
+				_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
+					"error": "no offsets",
+					"data":  err,
+				})
+			}
+			log.Fatalf("No offsets found for %s/%s (hash: %x)", noOffsetsErr.Version, noOffsetsErr.Arch, noOffsetsErr.Hash[:])
 			return
 		}
 		panic(err)
