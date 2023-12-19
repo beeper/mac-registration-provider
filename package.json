@@ -1,0 +1,10 @@
+{
+  "name": "nacserv-native",
+  "private": true,
+  "version": "0.1.0",
+  "files": [
+    "package.json",
+    "nacserv-native-x86",
+    "nacserv-native-arm64"
+  ]
+}
