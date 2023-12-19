@@ -60,3 +60,16 @@ jobs:
           name: mac-registration-provider-x86
           path: mac-registration-provider
           if-no-files-found: error
+
+  build-universal:
+    runs-on: macos-13
+    needs: [build-arm64, build-x86]
+    steps:
+      - uses: actions/download-artifact@v3
+      - name: Build universal binary
+        run: lipo -create -output mac-registration-provider-universal mac-registration-provider-x86/mac-registration-provider mac-registration-provider-arm64/mac-registration-provider
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mac-registration-provider-universal
+          path: mac-registration-provider-universal
+          if-no-files-found: error
