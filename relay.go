@@ -189,6 +189,25 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		fmt.Println("Delete", configPath, "if you want to regenerate the token")
 	}
 
+	reqID := 1
+	cancelableCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		ticker := time.NewTicker(3 * time.Minute)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				reqID++
+				err = wsjson.Write(ctx, c, WebsocketRequest[any]{
+					Command: "ping",
+					ReqID:   reqID,
+				})
+			case <-cancelableCtx.Done():
+			}
+		}
+	}()
+
 	log.Printf("Connection successful")
 	for {
 		var req WebsocketRequest[json.RawMessage]
