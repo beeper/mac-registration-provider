@@ -33,6 +33,7 @@ var overrideConfigPath = flag.String("config-path", "", "File to save registrati
 var jsonOutput = flag.Bool("json", false, "Output JSON instead of text")
 var submitUserAgent = fmt.Sprintf("mac-registration-provider/%s go/%s macOS/%s", Commit[:8], strings.TrimPrefix(runtime.Version(), "go"), versions.Current.SoftwareVersion)
 var once = flag.Bool("once", false, "Generate a single validation data, print it to stdout and exit")
+var checkCompatibility = flag.Bool("check-compatibility", false, "Check if offsets for the current OS version are available and exit")
 
 func main() {
 	flag.Parse()
@@ -63,6 +64,7 @@ func main() {
 				_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
 					"error": "no offsets",
 					"data":  err,
+					"ok":    false,
 				})
 			}
 			log.Fatalf("No offsets found for %s/%s (hash: %s)", noOffsetsErr.Version, noOffsetsErr.Arch, noOffsetsErr.Hash)
@@ -74,6 +76,15 @@ func main() {
 	err = InitSanityCheck()
 	if err != nil {
 		panic(err)
+	}
+	if *checkCompatibility {
+		log.Println("Compatibility check successful")
+		if *jsonOutput {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
+				"ok": true,
+			})
+		}
+		return
 	}
 	log.Println("Fetching certificate...")
 	err = InitFetchCert(context.Background())
