@@ -73,10 +73,19 @@ func main() {
 		panic(err)
 	}
 	log.Println("Running sanity check...")
+	safetyExitCancel := make(chan struct{})
+	go func() {
+		select {
+		case <-time.After(5 * time.Second):
+			log.Fatalln("Sanity check timed out")
+		case <-safetyExitCancel:
+		}
+	}()
 	err = InitSanityCheck()
 	if err != nil {
 		panic(err)
 	}
+	close(safetyExitCancel)
 	if *checkCompatibility {
 		log.Println("Compatibility check successful")
 		if *jsonOutput {
