@@ -129,6 +129,11 @@ func main() {
 				break
 			} else if strings.HasPrefix(err.Error(), "failed to register:") {
 				log.Printf("Error in relay connection: %v, not reconnecting", err)
+				if *jsonOutput {
+					_ = json.NewEncoder(os.Stdout).Encode(map[string]any{
+						"error": "registration rejected",
+					})
+				}
 				os.Exit(10)
 			}
 			log.Printf("Error in relay connection: %v, reconnecting in %v", err, reconnectIn)
