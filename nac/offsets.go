@@ -22,13 +22,22 @@ var offsets_13_6 = imdOffsetTuple{arm64: imdOffsets{
 	NACSignAddress:             0x3e5184,
 }}
 
-var offsets_14_0 = imdOffsetTuple{arm64: imdOffsets{
-	ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-	ReferenceAddress:           0xc00ec,
-	NACInitAddress:             0x4af610,
-	NACKeyEstablishmentAddress: 0x49ce74,
-	NACSignAddress:             0x477080,
-}}
+var offsets_14_0 = imdOffsetTuple{
+	x86: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0xd5a4d,
+		NACInitAddress:             0x543210,
+		NACKeyEstablishmentAddress: 0x523250,
+		NACSignAddress:             0x536540,
+	},
+	arm64: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0xc00ec,
+		NACInitAddress:             0x4af610,
+		NACKeyEstablishmentAddress: 0x49ce74,
+		NACSignAddress:             0x477080,
+	},
+}
 
 var offsets_14_1 = imdOffsetTuple{
 	x86: imdOffsets{

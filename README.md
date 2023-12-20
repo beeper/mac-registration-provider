@@ -4,7 +4,7 @@ A small service that generates iMessage registration data on a Mac.
 ## Supported OS versions
 The tool is currently quite hacky, so it only works on specific versions of macOS.
 
-* Intel: 11.5 - 11.7, 14.1 - 14.3
+* Intel: 11.5 - 11.7, 14.0 - 14.3
 * Apple Silicon: 13.5 - 13.6, 14.0 - 14.3
 
 On unsupported versions, it will tell you that it's unsupported and exit.
