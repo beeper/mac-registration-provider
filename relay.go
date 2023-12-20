@@ -97,17 +97,22 @@ func isDir(dir string) bool {
 }
 
 func readConfig() (string, *RelayConfig, error) {
-	baseConfigDir, err := os.UserConfigDir()
-	if err != nil {
-		return "", nil, fmt.Errorf("failed to get user config dir: %w", err)
-	}
-	configPath := filepath.Join(baseConfigDir, "beeper-registration-provider", "config.json")
-	configDir := filepath.Dir(configPath)
-	legacyConfigDir := filepath.Join(baseConfigDir, "beeper-validation-provider")
-	if isDir(legacyConfigDir) && !isDir(configDir) {
-		err = os.Rename(legacyConfigDir, configDir)
+	var configPath string
+	if *overrideConfigPath != "" {
+		configPath = *overrideConfigPath
+	} else {
+		baseConfigDir, err := os.UserConfigDir()
 		if err != nil {
-			log.Printf("Failed to rename legacy config dir: %v", err)
+			return "", nil, fmt.Errorf("failed to get user config dir: %w", err)
+		}
+		configPath = filepath.Join(baseConfigDir, "beeper-registration-provider", "config.json")
+		configDir := filepath.Dir(configPath)
+		legacyConfigDir := filepath.Join(baseConfigDir, "beeper-validation-provider")
+		if isDir(legacyConfigDir) && !isDir(configDir) {
+			err = os.Rename(legacyConfigDir, configDir)
+			if err != nil {
+				log.Printf("Failed to rename legacy config dir: %v", err)
+			}
 		}
 	}
 	configData, err := os.ReadFile(configPath)
