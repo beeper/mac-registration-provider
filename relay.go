@@ -128,7 +128,7 @@ func writeConfig(cfg *RelayConfig, configPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create config dir: %w", err)
 	}
-	file, err := os.OpenFile(configPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0700)
+	file, err := os.OpenFile(configPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to open config file: %w", err)
 	}
