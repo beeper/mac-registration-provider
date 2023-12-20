@@ -227,6 +227,7 @@ func ConnectRelay(ctx context.Context, addr string) error {
 					ReqID:   reqID,
 				})
 			case <-cancelableCtx.Done():
+				return
 			}
 		}
 	}()
