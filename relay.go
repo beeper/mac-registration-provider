@@ -90,12 +90,25 @@ type RelayConfig struct {
 	Secret string `json:"secret"`
 }
 
+func isDir(dir string) bool {
+	stat, err := os.Stat(dir)
+	return err == nil && stat.IsDir()
+}
+
 func readConfig() (string, *RelayConfig, error) {
-	configDir, err := os.UserConfigDir()
+	baseConfigDir, err := os.UserConfigDir()
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to get user config dir: %w", err)
 	}
-	configPath := filepath.Join(configDir, "beeper-validation-provider", "config.json")
+	configPath := filepath.Join(baseConfigDir, "beeper-registration-provider", "config.json")
+	configDir := filepath.Dir(configPath)
+	legacyConfigDir := filepath.Join(configDir, "beeper-validation-provider")
+	if isDir(legacyConfigDir) && !isDir(configDir) {
+		err = os.Rename(legacyConfigDir, configDir)
+		if err != nil {
+			log.Printf("Failed to rename legacy config dir: %v", err)
+		}
+	}
 	configData, err := os.ReadFile(configPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return "", nil, fmt.Errorf("failed to read config file: %w", err)
