@@ -102,7 +102,7 @@ func readConfig() (string, *RelayConfig, error) {
 	}
 	configPath := filepath.Join(baseConfigDir, "beeper-registration-provider", "config.json")
 	configDir := filepath.Dir(configPath)
-	legacyConfigDir := filepath.Join(configDir, "beeper-validation-provider")
+	legacyConfigDir := filepath.Join(baseConfigDir, "beeper-validation-provider")
 	if isDir(legacyConfigDir) && !isDir(configDir) {
 		err = os.Rename(legacyConfigDir, configDir)
 		if err != nil {
