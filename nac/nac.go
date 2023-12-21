@@ -39,11 +39,12 @@ func sha256sum(path string) (hash [32]byte, err error) {
 type NoOffsetsError struct {
 	Hash    string `json:"hash"`
 	Version string `json:"version"`
+	BuildID string `json:"build_id"`
 	Arch    string `json:"arch"`
 }
 
 func (err NoOffsetsError) Error() string {
-	return fmt.Sprintf("no offsets for %s/%s (hash: %s)", err.Version, err.Arch, err.Hash)
+	return fmt.Sprintf("no offsets for %s/%s/%s (hash: %s)", err.Version, err.BuildID, err.Arch, err.Hash)
 }
 
 func Load() error {
@@ -61,6 +62,7 @@ func Load() error {
 		return NoOffsetsError{
 			Hash:    hex.EncodeToString(hash[:]),
 			Version: versions.Current.SoftwareVersion,
+			BuildID: versions.Current.SoftwareBuildID,
 			Arch:    runtime.GOARCH,
 		}
 	}

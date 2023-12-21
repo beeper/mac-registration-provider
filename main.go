@@ -67,7 +67,7 @@ func main() {
 					"ok":    false,
 				})
 			}
-			log.Fatalf("No offsets found for %s/%s (hash: %s)", noOffsetsErr.Version, noOffsetsErr.Arch, noOffsetsErr.Hash)
+			log.Fatalf("No offsets found for %s/%s/%s (hash: %s)", noOffsetsErr.Version, noOffsetsErr.BuildID, noOffsetsErr.Arch, noOffsetsErr.Hash)
 			return
 		}
 		panic(err)
