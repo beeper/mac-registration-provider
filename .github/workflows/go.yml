@@ -55,6 +55,9 @@ jobs:
       - name: Build
         run: go build -v -ldflags "-X main.Commit=${{ github.sha }}"
 
+      - name: Run the binary
+        run: ./mac-registration-provider -once
+
       - uses: actions/upload-artifact@v3
         with:
           name: mac-registration-provider-x86
