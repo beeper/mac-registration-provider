@@ -2,6 +2,7 @@ package versions
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"os"
 	"os/exec"
@@ -34,9 +35,21 @@ func getSoftwareName() string {
 }
 
 func getSerialNumber() (serial, uuid string) {
-	data, err := exec.Command("system_profiler", "SPHardwareDataType", "-json").Output()
+	data, err = exec.Command("system_profiler", "SPHardwareDataType", "-json").Output()
 	if err != nil {
-		panic(fmt.Errorf("error running system_profiler: %w", err))
+		data, err = exec.Command("system_profiler", "SPHardwareDataType", "-xml").Output()
+		if err != nil {
+			panic(fmt.Errorf("error running system_profiler: %w", err))
+		}
+		var result struct {
+			Data struct {
+				SPHardwareDataType []struct {
+					SerialNumber string `xml:"serial_number"`
+					PlatformUUID string `xml:"platform_UUID"`
+				} `xml:"array>item"`
+			} `xml:"array>dict"`
+		}
+		return result.Data.SPHardwareDataType[0].SerialNumber, result.Data.SPHardwareDataType[0].PlatformUUID
 	}
 	return gjson.GetBytes(data, "SPHardwareDataType.0.serial_number").Str,
 		gjson.GetBytes(data, "SPHardwareDataType.0.platform_UUID").Str
