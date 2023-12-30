@@ -35,7 +35,7 @@ func getSoftwareName() string {
 }
 
 func getSerialNumber() (serial, uuid string) {
-	data, err = exec.Command("system_profiler", "SPHardwareDataType", "-json").Output()
+	data, err := exec.Command("system_profiler", "SPHardwareDataType", "-json").Output()
 	if err != nil {
 		data, err = exec.Command("system_profiler", "SPHardwareDataType", "-xml").Output()
 		if err != nil {
