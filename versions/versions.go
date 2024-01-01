@@ -41,8 +41,8 @@ func getSerialNumber() (serial, uuid string) {
 		if err != nil {
 			panic(fmt.Errorf("error running system_profiler: %w", err))
 		}
-		serialRegex := regexp.MustCompile("<key>serial_number</key>\\s*<string>([^<]*)</string>")
-		uuidRegex := regexp.MustCompile("<key>platform_UUID</key>\\s*<string>([^<]*)</string>")
+		serialRegex := regexp.MustCompile(`<key>serial_number</key>\s*<string>([^<]*)</string>`)
+		uuidRegex := regexp.MustCompile(`<key>platform_UUID</key>\s*<string>([^<]*)</string>`)
 
 		serial = serialRegex.FindStringSubmatch(string(out))[1]
 		uuid = uuidRegex.FindStringSubmatch(string(out))[1]
