@@ -41,7 +41,7 @@ jobs:
           if-no-files-found: error
 
   build-x86:
-    runs-on: macos-13
+    runs-on: macos-11
 
     steps:
       - uses: actions/checkout@v3
