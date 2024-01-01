@@ -5,6 +5,14 @@ import (
 	"fmt"
 )
 
+var offsets_10_13_6 = imdOffsetTuple{x86: imdOffsets{
+	ReferenceSymbol:            "newLocalDeliveryServiceStatString",
+	ReferenceAddress:           0x233c34,
+	NACInitAddress:             0x3ac270,
+	NACKeyEstablishmentAddress: 0x3ac290,
+	NACSignAddress:             0x3ac2b0,
+}}
+
 var offsets_10_14_6 = imdOffsetTuple{x86: imdOffsets{
 	ReferenceSymbol:            "newLocalDeliveryServiceStatString",
 	ReferenceAddress:           0x238842,
@@ -176,6 +184,8 @@ var offsets_14_3 = imdOffsetTuple{
 
 // offsets is a map from sha256 hash of identityservicesd to the function pointer offsets in that binary.
 var offsets = map[[32]byte]imdOffsetTuple{
+	// macOS 10.13.6
+	hexToByte32("0d9430e530bfb1eb528152e6f3d062408867bd159d54333228742dd7020312a8"): offsets_10_13_6,
 	// macOS 10.14.6
 	hexToByte32("23f14e11c672c07ef5934614ae2b83b34065ffe179e4a9bcdcdf00c2b724b3df"): offsets_10_14_6,
 	// macOS 10.15.1
