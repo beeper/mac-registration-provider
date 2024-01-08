@@ -103,17 +103,17 @@ var offsets_14_2 = imdOffsetTuple{
 var offsets_14_3 = imdOffsetTuple{
 	x86: imdOffsets{
 		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-		ReferenceAddress:           0xd45d9,
-		NACInitAddress:             0x54c660,
-		NACKeyEstablishmentAddress: 0x52c6a0,
-		NACSignAddress:             0x53f990,
+		ReferenceAddress:           0xd4d39,
+		NACInitAddress:             0x54c6c0,
+		NACKeyEstablishmentAddress: 0x52c700,
+		NACSignAddress:             0x53f9f0,
 	},
 	arm64: imdOffsets{
 		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-		ReferenceAddress:           0xbd6f4,
-		NACInitAddress:             0x4b54e0,
-		NACKeyEstablishmentAddress: 0x4a2d44,
-		NACSignAddress:             0x47cf50,
+		ReferenceAddress:           0xbdbdc,
+		NACInitAddress:             0x4b5590,
+		NACKeyEstablishmentAddress: 0x4a2df4,
+		NACSignAddress:             0x47d000,
 	},
 }
 
@@ -144,7 +144,7 @@ var offsets = map[[32]byte]imdOffsetTuple{
 	// macOS 14.2
 	hexToByte32("034fc179e1cce559931a8e46866f54154cb1c5413902319473537527a2702b64"): offsets_14_2,
 	// macOS 14.3
-	hexToByte32("5b50140c83131b4f4bc32f5eb0679cf0763d41d3bfc4cc1c7a67e9c95779dc24"): offsets_14_3,
+	hexToByte32("1bb81b44add0f5f94a6b2abc0560fd3b6958667aad17208622163b16d35c7637"): offsets_14_3,
 }
 
 type imdOffsetTuple struct {
