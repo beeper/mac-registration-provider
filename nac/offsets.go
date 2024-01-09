@@ -79,6 +79,23 @@ var offsets_11_7_7 = imdOffsetTuple{x86: imdOffsets{
 	NACSignAddress:             0x3c71a0,
 }}
 
+var offsets_12_7_1 = imdOffsetTuple{
+	x86: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0xb2278,
+		NACInitAddress:             0x4132e0,
+		NACKeyEstablishmentAddress: 0x465e00,
+		NACSignAddress:             0x405c10,
+	},
+	arm64: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0x0b562c,
+		NACInitAddress:             0x43d408,
+		NACKeyEstablishmentAddress: 0x3fdafc,
+		NACSignAddress:             0x3f2844,
+	},
+}
+
 var offsets_13_3_1 = imdOffsetTuple{
 	x86: imdOffsets{
 		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
@@ -208,6 +225,8 @@ var offsets = map[[32]byte]imdOffsetTuple{
 	hexToByte32("80107d249088d9762ec38c8f86d6797b5070d476377e7c5ddacf83ad32d00a1e"): offsets_11_7_7,
 	// macOS 12.6.3
 	hexToByte32("6e8caf477c2b4d3a56a91835a2b6455f36fb0feb13006def7516ac09578c67d0"): {},
+	// macOS 12.7.1
+	hexToByte32("5833338da6350266eda33f5501c5dfc793e0632b52883aa2389c438c02d03718"): offsets_12_7_1,
 	// macOS 13.2.1
 	hexToByte32("4d96de9438fdea5b0b7121e485541ecf0a74489eeb330c151a7d44d289dd3a85"): {},
 	// macOS 13.3.1
