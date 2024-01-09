@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/tidwall/gjson"
@@ -36,10 +37,20 @@ func getSoftwareName() string {
 func getSerialNumber() (serial, uuid string) {
 	data, err := exec.Command("system_profiler", "SPHardwareDataType", "-json").Output()
 	if err != nil {
-		panic(fmt.Errorf("error running system_profiler: %w", err))
+		out, err := exec.Command("system_profiler", "SPHardwareDataType", "-xml").Output()
+		if err != nil {
+			panic(fmt.Errorf("error running system_profiler: %w", err))
+		}
+		serialRegex := regexp.MustCompile(`<key>serial_number</key>\s*<string>([^<]*)</string>`)
+		uuidRegex := regexp.MustCompile(`<key>platform_UUID</key>\s*<string>([^<]*)</string>`)
+
+		serial = serialRegex.FindStringSubmatch(string(out))[1]
+		uuid = uuidRegex.FindStringSubmatch(string(out))[1]
+	} else {
+		serial = gjson.GetBytes(data, "SPHardwareDataType.0.serial_number").Str
+		uuid = gjson.GetBytes(data, "SPHardwareDataType.0.platform_UUID").Str
 	}
-	return gjson.GetBytes(data, "SPHardwareDataType.0.serial_number").Str,
-		gjson.GetBytes(data, "SPHardwareDataType.0.platform_UUID").Str
+	return serial, uuid
 }
 
 func getHostname() string {
