@@ -18,9 +18,9 @@ A future version may work in less hacky ways to support more OS versions.
    ![screenshot](https://github.com/beeper/mac-registration-provider/assets/1048265/4a419ae1-8996-4af4-876e-5723db088816)  
    Alternatively, you can download the latest build from GitHub actions
    ([direct link](https://nightly.link/beeper/mac-registration-provider/workflows/go/main/mac-registration-provider-universal.zip)).
-3. Open Terminal app (<kbd>⌘</kbd> + <kbd>space</kbd> -> Terminal), type `cd Downloads`, hit enter
-4. Type `chmod +x mac-registration-provider`, hit enter
-5. Type `./mac-registration-provider`, hit enter
+2. Open Terminal app (<kbd>⌘</kbd> + <kbd>space</kbd> -> Terminal), type `cd Downloads`, hit enter
+3. Type `chmod +x mac-registration-provider`, hit enter
+4. Type `./mac-registration-provider`, hit enter
 
 ## Future improvements
 If anyone wants to package this into an app that lives in your dock and runs at startup, we'd appreciate it!
