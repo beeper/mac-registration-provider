@@ -21,6 +21,9 @@ A future version may work in less hacky ways to support more OS versions.
 2. Open Terminal app (<kbd>⌘</kbd> + <kbd>space</kbd> -> Terminal), type `cd Downloads`, hit enter
 3. Type `chmod +x mac-registration-provider`, hit enter
 4. Type `./mac-registration-provider`, hit enter
+5. If you get a popup saying "the developer cannot be verified", go to
+   Settings -> Privacy & Security and scroll down. There should be an entry
+   for mac-registration-provider and a button to "Allow Anyway".
 
 ## Future improvements
 If anyone wants to package this into an app that lives in your dock and runs at startup, we'd appreciate it!
