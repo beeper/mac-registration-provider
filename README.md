@@ -6,8 +6,8 @@ registration code and use it in Beeper Mini.
 ## Supported MacOS versions
 The tool is currently quite hacky, so it only works on specific versions of macOS.
 
-* Intel: 11.5 - 11.7, 13.3.1, 13.5 - 13.6, 14.0 - 14.3
-* Apple Silicon: 13.3.1, 13.5 - 13.6, 14.0 - 14.3
+* Intel: 10.14.6, 10.15.1 - 10.15.7, 11.5 - 11.7, 12.7.1, 13.3.1, 13.5 - 13.6, 14.0 - 14.3
+* Apple Silicon: 12.7.1, 13.3.1, 13.5 - 13.6, 14.0 - 14.3
 
 On unsupported versions, it will tell you that it's unsupported and exit.
 A future version may work in less hacky ways to support more OS versions.
@@ -15,8 +15,7 @@ A future version may work in less hacky ways to support more OS versions.
 ## Usage
 1. On your Mac, download the latest `mac-registration-provider` file from the
    latest [release](https://github.com/beeper/mac-registration-provider/releases)
-   ![screenshot](https://github.com/beeper/mac-registration-provider/assets/1048265/4a419ae1-8996-4af4-876e-5723db088816)
-
+   ![screenshot](https://github.com/beeper/mac-registration-provider/assets/1048265/4a419ae1-8996-4af4-876e-5723db088816)  
    Alternatively, you can download the latest build from GitHub actions
    ([direct link](https://nightly.link/beeper/mac-registration-provider/workflows/go/main/mac-registration-provider-universal.zip)).
 2. Open Terminal app (<kbd>⌘</kbd> + <kbd>space</kbd> -> Terminal), type `cd Downloads`, hit enter
