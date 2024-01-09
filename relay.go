@@ -25,10 +25,11 @@ type WebsocketRequest[T any] struct {
 }
 
 type RegisterBody struct {
-	Code   string `json:"code,omitempty"`
-	Secret string `json:"secret,omitempty"`
-	Commit string `json:"commit,omitempty"`
-	Error  string `json:"error,omitempty"`
+	Code     string            `json:"code,omitempty"`
+	Secret   string            `json:"secret,omitempty"`
+	Commit   string            `json:"commit,omitempty"`
+	Versions versions.Versions `json:"versions"`
+	Error    string            `json:"error,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -166,9 +167,10 @@ func ConnectRelay(ctx context.Context, addr string) error {
 		Command: "register",
 		ReqID:   1,
 		Data: &RegisterBody{
-			Code:   config.Code,
-			Secret: config.Secret,
-			Commit: Commit,
+			Code:     config.Code,
+			Secret:   config.Secret,
+			Commit:   Commit,
+			Versions: versions.Current,
 		},
 	})
 	if err != nil {
