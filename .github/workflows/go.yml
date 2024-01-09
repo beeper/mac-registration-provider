@@ -11,16 +11,16 @@ jobs:
     runs-on: macos-13-xlarge
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Go ${{ env.GO_VERSION }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
       - name: Build
-        run: go build -v -ldflags "-X main.Commit=${{ github.sha }}"
+        run: MACOSX_DEPLOYMENT_TARGET=11.0 go build -v -ldflags "-X main.Commit=${{ github.sha }}"
 
       - name: Run the binary
         run: ./mac-registration-provider -once
@@ -34,7 +34,7 @@ jobs:
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.0
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mac-registration-provider-arm64
           path: mac-registration-provider
@@ -44,21 +44,21 @@ jobs:
     runs-on: macos-11
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Go ${{ env.GO_VERSION }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
       - name: Build
-        run: go build -v -ldflags "-X main.Commit=${{ github.sha }}"
+        run: MACOSX_DEPLOYMENT_TARGET=10.13 go build -v -ldflags "-X main.Commit=${{ github.sha }}"
 
       - name: Run the binary
         run: ./mac-registration-provider -once
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mac-registration-provider-x86
           path: mac-registration-provider
@@ -68,10 +68,10 @@ jobs:
     runs-on: macos-13
     needs: [build-arm64, build-x86]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
       - name: Build universal binary
         run: lipo -create -output mac-registration-provider-universal mac-registration-provider-x86/mac-registration-provider mac-registration-provider-arm64/mac-registration-provider
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mac-registration-provider-universal
           path: mac-registration-provider-universal
