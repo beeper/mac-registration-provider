@@ -216,6 +216,23 @@ var offsets_14_3_b2 = imdOffsetTuple{
 	},
 }
 
+var offsets_14_3_b3 = imdOffsetTuple{
+	x86: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0x0d47c9,
+		NACInitAddress:             0x54c6d0,
+		NACKeyEstablishmentAddress: 0x52c710,
+		NACSignAddress:             0x53fa00,
+	},
+	arm64: imdOffsets{
+		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
+		ReferenceAddress:           0x0bd81c,
+		NACInitAddress:             0x4b5580,
+		NACKeyEstablishmentAddress: 0x4a2de4,
+		NACSignAddress:             0x47cff0,
+	},
+}
+
 // offsets is a map from sha256 hash of identityservicesd to the function pointer offsets in that binary.
 var offsets = map[[32]byte]imdOffsetTuple{
 	// macOS 10.13.6
@@ -260,10 +277,12 @@ var offsets = map[[32]byte]imdOffsetTuple{
 	hexToByte32("47aa51e63ced0bb00dd27dab0def6f065a1a4911e250b79761681865fbd03644"): offsets_14_1,
 	// macOS 14.2
 	hexToByte32("034fc179e1cce559931a8e46866f54154cb1c5413902319473537527a2702b64"): offsets_14_2,
-	// macOS 14.3 (older beta) TODO remove betas after release
+	// macOS 14.3 (beta 1) TODO remove betas after release
 	hexToByte32("5b50140c83131b4f4bc32f5eb0679cf0763d41d3bfc4cc1c7a67e9c95779dc24"): offsets_14_3_b1,
-	// macOS 14.3 (newer beta)
+	// macOS 14.3 (beta 2)
 	hexToByte32("1bb81b44add0f5f94a6b2abc0560fd3b6958667aad17208622163b16d35c7637"): offsets_14_3_b2,
+	// macOS 14.3 (beta 3)
+	hexToByte32("925c30618e05ee9e8f457073c8adb4e72f67b974a27855f7d463d69018d97822"): offsets_14_3_b3,
 }
 
 type imdOffsetTuple struct {
