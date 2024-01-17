@@ -12,7 +12,7 @@ The tool is currently quite hacky, so it only works on specific versions of macO
 On unsupported versions, it will tell you that it's unsupported and exit.
 A future version may work in less hacky ways to support more OS versions.
 
-If your version is not supported, 
+If your version is not supported, upload the zipped version of `/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd` in a new issue so that support can be added.
 
 ## Usage
 1. On your Mac, download the latest `mac-registration-provider` file from the
