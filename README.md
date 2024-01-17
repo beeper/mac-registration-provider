@@ -12,6 +12,8 @@ The tool is currently quite hacky, so it only works on specific versions of macO
 On unsupported versions, it will tell you that it's unsupported and exit.
 A future version may work in less hacky ways to support more OS versions.
 
+If your version is not supported, 
+
 ## Usage
 1. On your Mac, download the latest `mac-registration-provider` file from the
    latest [release](https://github.com/beeper/mac-registration-provider/releases)
