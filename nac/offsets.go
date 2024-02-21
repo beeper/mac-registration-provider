@@ -131,23 +131,6 @@ var offsets_13_6 = imdOffsetTuple{
 		NACSignAddress:             0x3e5184,
 	},
 }
-// Offsets from macOS 13.6.4
-var offsets_13_6_4 = imdOffsetTuple{
-        x86: imdOffsets{
-                ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-		ReferenceAddress:           0x0cc743,
-		NACInitAddress:             0x4b91e0,
-		NACKeyEstablishmentAddress: 0x499220,
-		NACSignAddress:             0x4ac510,
-	},
-        arm64: imdOffsets{
-                ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
-		ReferenceAddress:            0x0b524c,
-		NACInitAddress:             0x41d714,
-		NACKeyEstablishmentAddress: 0x40af78,
-		NACSignAddress:             0x3e5184,
-	},
-}
 
 var offsets_14_0 = imdOffsetTuple{
 	x86: imdOffsets{
