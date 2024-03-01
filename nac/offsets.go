@@ -238,6 +238,8 @@ var offsets = map[[32]byte]imdOffsetTuple{
 	hexToByte32("fff8db27fef2a2b874f7bc6fb303a98e3e3b8aceb8dd4c5bfa2bad7b76ea438a"): offsets_13_6,
 	// macOS 13.6.3
 	hexToByte32("2c674438d30bf489695f2d1b8520afc30cbfb183af82d2fc53d74ce39a25b24e"): offsets_13_6,
+	// macOS 13.6.4
+	hexToByte32("8f22dcfda56a4d3c38931f20fe33db1a6720e4d8571e452aa5a8b56b4c69842a"): offsets_13_6,
 	// macOS 14.0
 	hexToByte32("9ffda11206ef874b1e6cb1d8f8fed330d2ac2cbbc87afc15485f4e4371afcd9a"): offsets_14_0,
 	// macOS 14.1 - 14.1.2
