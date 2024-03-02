@@ -6,8 +6,8 @@ registration code and use it in Beeper Mini.
 ## Supported MacOS versions
 The tool is currently quite hacky, so it only works on specific versions of macOS.
 
-* Intel: 10.14.6, 10.15.1 - 10.15.7, 11.5 - 11.7, 12.7.1, 13.3.1, 13.5 - 13.6.4, 14.0 - 14.3
-* Apple Silicon: 12.7.1, 13.3.1, 13.5 - 13.6.4, 14.0 - 14.3
+* Intel: 10.14.6, 10.15.1 - 10.15.7, 11.5 - 11.7, 12.7.1, 13.3.1, 13.5 - 13.6.4, 14.0 - 14.3, 14.4 (beta)
+* Apple Silicon: 12.7.1, 13.3.1, 13.5 - 13.6.4, 14.0 - 14.3, 14.4 (beta)
 
 On unsupported versions, it will tell you that it's unsupported and exit.
 A future version may work in less hacky ways to support more OS versions.
