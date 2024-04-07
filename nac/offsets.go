@@ -200,6 +200,7 @@ var offsets_14_3 = imdOffsetTuple{
 	},
 }
 
+// macOS 14.4.1
 var offsets_14_4_1 = imdOffsetTuple{
 	x86: imdOffsets{
 		ReferenceSymbol:            "IDSProtoKeyTransparencyTrustedServiceReadFrom",
