@@ -47,14 +47,7 @@ var (
 	}
 )
 
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run test.go <path_to_binary>")
-		return
-	}
-
-	filePath := os.Args[1]
-
+func PrintOffsets(filePath string) {
 	architectures, err := ScanMachOFATBinary(filePath)
 	if err != nil {
 		fmt.Println("Error:", err)
