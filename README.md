@@ -4,7 +4,7 @@ not have access to Beeper Cloud, you can use this to generate an iMessage
 registration code and use it in Beeper Mini.
 
 ## Supported MacOS versions
-The tool is currently quite hacky, so it only works on specific versions of macOS.
+~~The tool is currently quite hacky, so it only works on specific versions of macOS.~~
 
 * Intel: 10.14.6, 10.15.1 - 10.15.7, 11.5 - 11.7, 12.7.1, 13.3.1, 13.5 - 13.6.4, 14.0 - 14.3
 * Apple Silicon: 12.7.1, 13.3.1, 13.5 - 13.6.4, 14.0 - 14.3
@@ -40,3 +40,4 @@ with Beeper is Relay, which is the default.
   * `-submit-interval` - The interval to submit data at (required).
   * `-submit-token` - A bearer token to include when submitting data (defaults to no auth).
 * `-once` - generate a single registration data, print it to stdout and exit
+* `-find-offsets` - find the offsets of the relevant bytes in the binary. This is used for debugging.

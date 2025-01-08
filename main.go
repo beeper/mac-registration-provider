@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beeper/mac-registration-provider/find_offsets"
 	"github.com/beeper/mac-registration-provider/nac"
 	"github.com/beeper/mac-registration-provider/versions"
 )
@@ -34,9 +35,17 @@ var jsonOutput = flag.Bool("json", false, "Output JSON instead of text")
 var submitUserAgent = fmt.Sprintf("mac-registration-provider/%s go/%s macOS/%s", Commit[:8], strings.TrimPrefix(runtime.Version(), "go"), versions.Current.SoftwareVersion)
 var once = flag.Bool("once", false, "Generate a single validation data, print it to stdout and exit")
 var checkCompatibility = flag.Bool("check-compatibility", false, "Check if offsets for the current OS version are available and exit")
+var shouldFindOffsets = flag.Bool("find-offsets", false, "Find offsets in the specified binary")
+var identityServiceDPath = flag.String("identityservicesd", "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd", "Path to the identityservicesd binary")
 
 func main() {
 	flag.Parse()
+
+	if *shouldFindOffsets {
+		find_offsets.PrintOffsets(*identityServiceDPath)
+		return
+	}
+
 	var urls []string
 	if *submitInterval > 0 {
 		urls = flag.Args()
