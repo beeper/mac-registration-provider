@@ -16,10 +16,12 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/beeper/mac-registration-provider/find_offsets"
 	"github.com/beeper/mac-registration-provider/versions"
 )
 
 const identityservicesd = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
+const symbol = "IDSProtoKeyTransparencyTrustedServiceReadFrom"
 
 var nacInitAddr, nacKeyEstablishmentAddr, nacSignAddr unsafe.Pointer
 
@@ -59,13 +61,33 @@ func Load() error {
 		offs = offsets[hash].x86
 	}
 	if offs.ReferenceSymbol == "" {
-		return NoOffsetsError{
-			Hash:    hex.EncodeToString(hash[:]),
-			Version: versions.Current.SoftwareVersion,
-			BuildID: versions.Current.SoftwareBuildID,
-			Arch:    runtime.GOARCH,
+		// Call the FindOffsets function directly
+		newOffsets, err := FindOffsets(identityservicesd)
+		if err != nil {
+			return fmt.Errorf("failed to find offsets: %v", err)
+		}
+
+		if runtime.GOARCH == "arm64" {
+			offs = newOffsets.arm64
+		} else {
+			offs = newOffsets.x86
+		}
+
+		if offs.ReferenceSymbol == "" {
+			return NoOffsetsError{
+				Hash:    hex.EncodeToString(hash[:]),
+				Version: versions.Current.SoftwareVersion,
+				BuildID: versions.Current.SoftwareBuildID,
+				Arch:    runtime.GOARCH,
+			}
 		}
 	}
+
+	fmt.Printf("Reference Symbol: %s\n", offs.ReferenceSymbol)
+	fmt.Printf("Reference Address: %06x\n", offs.ReferenceAddress)
+	fmt.Printf("NAC Init Address: %06x\n", offs.NACInitAddress)
+	fmt.Printf("NAC Key Establishment Address: %06x\n", offs.NACKeyEstablishmentAddress)
+	fmt.Printf("NAC Sign Address: %06x\n", offs.NACSignAddress)
 
 	handle := C.dlopen(C.CString(identityservicesd), C.RTLD_LAZY)
 	if handle == nil {
@@ -80,6 +102,33 @@ func Load() error {
 	nacKeyEstablishmentAddr = unsafe.Add(base, offs.NACKeyEstablishmentAddress)
 	nacSignAddr = unsafe.Add(base, offs.NACSignAddress)
 	return nil
+}
+
+func FindOffsets(filePath string) (imdOffsetTuple, error) {
+	architectures, err := find_offsets.ScanMachOFATBinary(filePath)
+	if err != nil {
+		return imdOffsetTuple{}, err
+	}
+
+	searchResults := find_offsets.SearchInArchitectures(filePath, architectures, find_offsets.HexStringsModern)
+	offsets := imdOffsetTuple{
+		x86: imdOffsets{
+			ReferenceSymbol:            symbol,
+			ReferenceAddress:           searchResults[0]["ReferenceAddress (_IDSProtoKeyTransparencyTrustedServiceReadFrom)"][0],
+			NACInitAddress:             searchResults[0]["NACInitAddress"][0],
+			NACKeyEstablishmentAddress: searchResults[0]["NACKeyEstablishmentAddress"][0],
+			NACSignAddress:             searchResults[0]["NACSignAddress"][0],
+		},
+		arm64: imdOffsets{
+			ReferenceSymbol:            symbol,
+			ReferenceAddress:           searchResults[1]["ReferenceAddress (_IDSProtoKeyTransparencyTrustedServiceReadFrom)"][0],
+			NACInitAddress:             searchResults[1]["NACInitAddress"][0],
+			NACKeyEstablishmentAddress: searchResults[1]["NACKeyEstablishmentAddress"][0],
+			NACSignAddress:             searchResults[1]["NACSignAddress"][0],
+		},
+	}
+
+	return offsets, nil
 }
 
 func MeowMemory() func() {
